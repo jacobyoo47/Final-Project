@@ -1,0 +1,9 @@
+Jason Chen, Nick Tan, Jacob Yoo
+
+Project: Arcade
+
+Ideas:
+- Platformer
+    with Physics
+- Escape Room
+    with interactive objects
