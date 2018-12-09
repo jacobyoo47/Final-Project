@@ -28,6 +28,9 @@ class Player(arcade.Sprite):
         self.upMotion = False
         self.downMotion = False
 
+    def update():
+        pass
+
 class Room:
     """
     This class holds all the information about the
