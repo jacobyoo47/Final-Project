@@ -28,11 +28,17 @@ class Room:
     def __init__(self):
         # You may want many lists. Lists for coins, monsters, etc.
         self.wall_list = None
+        self.portal_list = None
 
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
 
+class Portal(arcade.Sprite):
+    """
+    This class represents the portals on our screen. It is a child class of
+    the arcade library's "Sprite" class.
+    """
 
 def setup_room_1():
     """
@@ -45,6 +51,7 @@ def setup_room_1():
     """ Set up the game and initialize the variables. """
     # Sprite lists
     room.wall_list = arcade.SpriteList()
+    room.portal_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -74,9 +81,14 @@ def setup_room_1():
     room.wall_list.append(wall)
 
     # If you want coins or monsters in a level, then add that code here.
+    # Make a portal
+    portal = Portal("gold_portal.png", SPRITE_SCALING)
+    portal.left = 5 * SPRITE_SIZE
+    portal.bottom = 6 * SPRITE_SIZE
+    room.portal_list.append(portal)
 
     # Load the background image for this level.
-    room.background = arcade.load_texture("screenshotoflab.png")
+    room.background = arcade.load_texture("dirt_texture.jpg")
 
     return room
 
@@ -90,6 +102,7 @@ def setup_room_2():
     """ Set up the game and initialize the variables. """
     # Sprite lists
     room.wall_list = arcade.SpriteList()
+    room.portal_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -117,7 +130,7 @@ def setup_room_2():
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture("screenshotoflab.png")
+    room.background = arcade.load_texture("dirt_texture.jpg")
 
     return room
 
@@ -191,6 +204,7 @@ class MyGame(arcade.Window):
 
         # If you have coins or monsters, then copy and modify the line
         # above for each list.
+        self.rooms[self.current_room].portal_list.draw()
 
         self.player_list.draw()
 
@@ -217,6 +231,10 @@ class MyGame(arcade.Window):
     def update(self, delta_time):
         """ Movement and game logic """
 
+        hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].portal_list)
+        for portal in hit_list:
+            portal.kill()
+
         # Call update on all sprites (The sprites don't do much in this
         # example though.)
         self.physics_engine.update()
@@ -233,7 +251,9 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
             self.player_sprite.center_x = SCREEN_WIDTH
-
+        #elif self.current_room == 0 and len(hit_list) > 0:
+            #self.current_room = 1
+            #self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
 def main():
     """ Main method """
