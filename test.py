@@ -76,7 +76,7 @@ def setup_room_1():
     # If you want coins or monsters in a level, then add that code here.
 
     # Load the background image for this level.
-    room.background = arcade.load_texture("screenshotoflab.png")
+    room.background = arcade.load_texture("dirt_texture.jpg")
 
     return room
 
@@ -117,7 +117,7 @@ def setup_room_2():
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture("screenshotoflab.png")
+    room.background = arcade.load_texture("dirt_texture.jpg")
 
     return room
 
