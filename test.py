@@ -6,7 +6,7 @@ Artwork from http://kenney.nl
 If Python and Arcade are installed, this example can be run from the command line with:
 python -m arcade.examples.sprite_rooms
 """
-
+import math
 import arcade
 import os
 
@@ -19,6 +19,14 @@ SCREEN_HEIGHT = SPRITE_SIZE * 15
 
 MOVEMENT_SPEED = 5
 
+class Player(arcade.Sprite):
+    def __init__(self):
+        """creates the character Sprite"""
+        super().__init__("Images/Character.png", SPRITE_SCALING)
+        self.leftMotion = False
+        self.rightMotion = False
+        self.upMotion = False
+        self.downMotion = False
 
 class Room:
     """
@@ -137,7 +145,7 @@ def setup_room_2():
 
 class MyGame(arcade.Window):
     """ Main application class. """
-
+    
     def __init__(self, width, height):
         """
         Initializer
@@ -165,7 +173,7 @@ class MyGame(arcade.Window):
         """ Set up the game and initialize the variables. """
         # Set up the player
         self.score = 0
-        self.player_sprite = arcade.Sprite("Images/Character.png", SPRITE_SCALING)
+        self.player_sprite = Player()
         self.player_sprite.center_x = 100
         self.player_sprite.center_y = 100
         self.player_list = arcade.SpriteList()
@@ -210,26 +218,77 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
+        
 
         if key == arcade.key.UP:
+            self.player_sprite.upMotion = True
             self.player_sprite.change_y = MOVEMENT_SPEED
         elif key == arcade.key.DOWN:
+            self.player_sprite.downMotion = True
             self.player_sprite.change_y = -MOVEMENT_SPEED
         elif key == arcade.key.LEFT:
+            self.player_sprite.leftMotion = True
             self.player_sprite.change_x = -MOVEMENT_SPEED
         elif key == arcade.key.RIGHT:
+            self.player_sprite.rightMotion = True
             self.player_sprite.change_x = MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
+        if self.player_sprite.upMotion and self.player_sprite.downMotion:
+            if key == arcade.key.UP:
+                self.player_sprite.upMotion = False
+                self.player_sprite.change_y = -MOVEMENT_SPEED
+            elif key == arcade.key.DOWN:
+                self.player_sprite.downMotion = False
+                self.player_sprite.change_y = MOVEMENT_SPEED
+            elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+                self.player_sprite.rightMotion = False
+                self.player_sprite.leftMotion = False
+                self.player_sprite.change_x = 0
+            
 
-        if key == arcade.key.UP or key == arcade.key.DOWN:
+        elif self.player_sprite.leftMotion and self.player_sprite.rightMotion:
+            if key == arcade.key.RIGHT:
+                self.player_sprite.rightMotion = False
+                self.player_sprite.change_x = -MOVEMENT_SPEED
+            elif key == arcade.key.LEFT:
+                self.player_sprite.leftMotion = False
+                self.player_sprite.change_x = MOVEMENT_SPEED
+            elif key == arcade.key.UP or key == arcade.key.DOWN:
+                self.player_sprite.upMotion = False
+                self.player_sprite.downMotion = False
+                self.player_sprite.change_y = 0
+
+        elif key == arcade.key.UP or key == arcade.key.DOWN:
+            self.player_sprite.upMotion = False
+            self.player_sprite.downMotion = False
             self.player_sprite.change_y = 0
         elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+            self.player_sprite.rightMotion = False
+            self.player_sprite.leftMotion = False
             self.player_sprite.change_x = 0
 
     def update(self, delta_time):
         """ Movement and game logic """
+
+        #Dealing with diagonal movement
+        if self.player_sprite.upMotion:
+            if self.player_sprite.rightMotion and self.player_sprite.change_x > 0:
+                x = math.sqrt(MOVEMENT_SPEED**2/2)
+                y = math.sqrt(MOVEMENT_SPEED**2/2)
+            elif self.player_sprite.leftMotion and self.player_sprite.change_x < 0:
+                x = -1 * math.sqrt(MOVEMENT_SPEED**2/2)
+                y = math.sqrt(MOVEMENT_SPEED**2/2)
+
+        if self.player_sprite.downMotion:
+            if self.player_sprite.rightMotion and self.player_sprite.change_x > 0:
+                x = math.sqrt(MOVEMENT_SPEED**2/2)
+                y = -1 * math.sqrt(MOVEMENT_SPEED**2/2)
+            elif self.player_sprite.leftMotion and self.player_sprite.change_x < 0:
+                x = -1 * math.sqrt(MOVEMENT_SPEED**2/2)
+                y = -1 * math.sqrt(MOVEMENT_SPEED**2/2)
+    
 
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].portal_list)
         for portal in hit_list:
