@@ -6,7 +6,7 @@ Artwork from http://kenney.nl
 If Python and Arcade are installed, this example can be run from the command line with:
 python -m arcade.examples.sprite_rooms
 """
-
+import math
 import arcade
 import os
 
@@ -19,6 +19,7 @@ SCREEN_HEIGHT = SPRITE_SIZE * 15
 
 MOVEMENT_SPEED = 5
 
+hit_list = []
 
 class Room:
     """
@@ -88,7 +89,7 @@ def setup_room_1():
     room.portal_list.append(portal)
 
     # Load the background image for this level.
-    room.background = arcade.load_texture("dirt_texture.jpg")
+    room.background = arcade.load_texture("Images/floor1.jpg")
 
     return room
 
@@ -130,7 +131,7 @@ def setup_room_2():
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture("dirt_texture.jpg")
+    room.background = arcade.load_texture("Images/floor1.jpg")
 
     return room
 
@@ -220,6 +221,7 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT:
             self.player_sprite.change_x = MOVEMENT_SPEED
 
+
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
 
@@ -232,13 +234,16 @@ class MyGame(arcade.Window):
         """ Movement and game logic """
 
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].portal_list)
-        for portal in hit_list:
-            portal.kill()
+        #for portal in hit_list:
+        #    portal.kill()
 
         # Call update on all sprites (The sprites don't do much in this
         # example though.)
         self.physics_engine.update()
 
+        # Debugging to check player's velocity in pos x and y direction
+        print(math.sqrt(self.player_sprite.change_x ** 2 + self.player_sprite.change_y **2))
+        
         # Do some logic here to figure out what room we are in, and if we need to go
         # to a different room.
         if self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 0:
@@ -251,9 +256,9 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
             self.player_sprite.center_x = SCREEN_WIDTH
-        #elif self.current_room == 0 and len(hit_list) > 0:
-            #self.current_room = 1
-            #self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+        elif self.current_room == 0 and len(hit_list) > 0:
+            self.current_room = 1
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
 def main():
     """ Main method """
