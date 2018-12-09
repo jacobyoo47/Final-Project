@@ -28,8 +28,6 @@ class Player(arcade.Sprite):
         self.upMotion = False
         self.downMotion = False
 
-    def update():
-        pass
 
 class Room:
     """
@@ -99,7 +97,7 @@ def setup_room_1():
     room.portal_list.append(portal)
 
     # Load the background image for this level.
-    room.background = arcade.load_texture("dirt_texture.jpg")
+    room.background = arcade.load_texture("Images/floor1.jpg")
 
     return room
 
@@ -141,7 +139,7 @@ def setup_room_2():
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
-    room.background = arcade.load_texture("dirt_texture.jpg")
+    room.background = arcade.load_texture("Images/floor1.jpg")
 
     return room
 
