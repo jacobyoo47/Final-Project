@@ -21,6 +21,9 @@ MOVEMENT_SPEED = 5
 
 hit_list = []
 
+    def update():
+        pass
+
 class Room:
     """
     This class holds all the information about the
