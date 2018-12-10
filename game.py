@@ -222,7 +222,7 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
         
-
+        ## MOVEMENT:
         if key == arcade.key.UP:
             self.player_sprite.upMotion = True
             self.player_sprite.change_y = MOVEMENT_SPEED
@@ -235,11 +235,15 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT:
             self.player_sprite.rightMotion = True
             self.player_sprite.change_x = MOVEMENT_SPEED
+
+        ## PLAYER INTERACTIONS:
         elif key == arcade.key.Z:
             self.player_sprite.useObject = True
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
+
+        ## MOVEMENT:
         if self.player_sprite.upMotion and self.player_sprite.downMotion:
             if key == arcade.key.UP:
                 self.player_sprite.upMotion = False
@@ -251,8 +255,6 @@ class MyGame(arcade.Window):
                 self.player_sprite.rightMotion = False
                 self.player_sprite.leftMotion = False
                 self.player_sprite.change_x = 0
-            
-
         elif self.player_sprite.leftMotion and self.player_sprite.rightMotion:
             if key == arcade.key.RIGHT:
                 self.player_sprite.rightMotion = False
@@ -264,7 +266,6 @@ class MyGame(arcade.Window):
                 self.player_sprite.upMotion = False
                 self.player_sprite.downMotion = False
                 self.player_sprite.change_y = 0
-
         elif key == arcade.key.UP or key == arcade.key.DOWN:
             self.player_sprite.upMotion = False
             self.player_sprite.downMotion = False
@@ -274,13 +275,15 @@ class MyGame(arcade.Window):
             self.player_sprite.leftMotion = False
             self.player_sprite.change_x = 0
         
+
+        ## PLAYER INTERACTIONS
         elif key == arcade.key.Z:
             self.player_sprite.useObject = False
 
     def update(self, delta_time):
         """ Movement and game logic """
 
-        #Dealing with diagonal movement
+        #Normalizing diagonal movement.\:
         if self.player_sprite.upMotion:
             if self.player_sprite.rightMotion and self.player_sprite.change_x > 0:
                 x = math.sqrt(MOVEMENT_SPEED**2/2)
@@ -297,7 +300,7 @@ class MyGame(arcade.Window):
                 x = -1 * math.sqrt(MOVEMENT_SPEED**2/2)
                 y = -1 * math.sqrt(MOVEMENT_SPEED**2/2)
     
-
+        #Collision list for portals
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].portal_list)
 
         # Call update on all sprites (The sprites don't do much in this
@@ -316,6 +319,7 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
             self.player_sprite.center_x = SCREEN_WIDTH
+        #PORTAL INTERACTION
         elif self.current_room == 0 and len(hit_list) > 0 and self.player_sprite.useObject == True: # len(hit_list) > 0 should be changed later on to be more specific
             self.current_room = 1
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
