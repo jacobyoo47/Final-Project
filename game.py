@@ -27,6 +27,7 @@ class Player(arcade.Sprite):
         self.rightMotion = False
         self.upMotion = False
         self.downMotion = False
+        self.useObject = False
 
 
 class Room:
@@ -169,6 +170,7 @@ class MyGame(arcade.Window):
         self.player_sprite = None
         self.player_list = None
         self.physics_engine = None
+        self.useObject = None
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -233,6 +235,8 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT:
             self.player_sprite.rightMotion = True
             self.player_sprite.change_x = MOVEMENT_SPEED
+        elif key == arcade.key.Z:
+            self.player_sprite.useObject = True
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -269,6 +273,9 @@ class MyGame(arcade.Window):
             self.player_sprite.rightMotion = False
             self.player_sprite.leftMotion = False
             self.player_sprite.change_x = 0
+        
+        elif key == arcade.key.Z:
+            self.player_sprite.useObject = False
 
     def update(self, delta_time):
         """ Movement and game logic """
@@ -292,8 +299,6 @@ class MyGame(arcade.Window):
     
 
         hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.rooms[self.current_room].portal_list)
-        for portal in hit_list:
-            portal.kill()
 
         # Call update on all sprites (The sprites don't do much in this
         # example though.)
@@ -311,9 +316,9 @@ class MyGame(arcade.Window):
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
             self.player_sprite.center_x = SCREEN_WIDTH
-        #elif self.current_room == 0 and len(hit_list) > 0:
-            #self.current_room = 1
-            #self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+        elif self.current_room == 0 and len(hit_list) > 0 and self.player_sprite.useObject == True: # len(hit_list) > 0 should be changed later on to be more specific
+            self.current_room = 1
+            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
 def main():
     """ Main method """
