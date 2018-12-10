@@ -9,6 +9,9 @@ python -m arcade.examples.sprite_rooms
 import math
 import arcade
 import os
+import scripts
+
+TEXT_BOX_HEIGHT = 100
 
 SPRITE_SCALING = 5
 SPRITE_NATIVE_SIZE = 8
@@ -171,6 +174,7 @@ class MyGame(arcade.Window):
         self.player_list = None
         self.physics_engine = None
         self.useObject = None
+        self.total_time = 0.0
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -212,6 +216,9 @@ class MyGame(arcade.Window):
 
         # Draw all the walls in this room
         self.rooms[self.current_room].wall_list.draw()
+
+        # Draw the text box/scrolling text (test)
+        scripts.displayTextBox('A box filled with nothing but cobwebs', SCREEN_WIDTH//2, TEXT_BOX_HEIGHT//2, SCREEN_WIDTH, TEXT_BOX_HEIGHT, arcade.color.DARK_BLUE)
 
         # If you have coins or monsters, then copy and modify the line
         # above for each list.
@@ -282,6 +289,8 @@ class MyGame(arcade.Window):
 
     def update(self, delta_time):
         """ Movement and game logic """
+        ## TIME:
+        self.total_time += delta_time
 
         #Normalizing diagonal movement.\:
         if self.player_sprite.upMotion:
