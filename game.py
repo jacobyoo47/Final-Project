@@ -22,13 +22,12 @@ MOVEMENT_SPEED = 5
 class Player(arcade.Sprite):
     def __init__(self):
         """creates the character Sprite"""
-        super().__init__("Images/Character.png", SPRITE_SCALING)
+        super().__init__("Images/CharacterRight.png", SPRITE_SCALING)
         self.leftMotion = False
         self.rightMotion = False
         self.upMotion = False
         self.downMotion = False
         self.useObject = False
-
 
 class Room:
     """
@@ -230,9 +229,11 @@ class MyGame(arcade.Window):
             self.player_sprite.downMotion = True
             self.player_sprite.change_y = -MOVEMENT_SPEED
         elif key == arcade.key.LEFT:
+            
             self.player_sprite.leftMotion = True
             self.player_sprite.change_x = -MOVEMENT_SPEED
         elif key == arcade.key.RIGHT:
+        
             self.player_sprite.rightMotion = True
             self.player_sprite.change_x = MOVEMENT_SPEED
 
