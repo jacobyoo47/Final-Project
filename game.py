@@ -179,7 +179,7 @@ class MyGame(arcade.Window):
         self.current_room = 0
 
         #Setting the state of the game
-        self.level = GAME
+        self.state = GAME
 
         self.current_message = None
 
@@ -378,7 +378,8 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                
+                self.player_sprite.change_x = 0
+                self.player_sprite.change_y = 0
                 self.current_message = items
                 self.state = DIALOGUE
                 # items.deliverMessage(arcade.color.DARK_BLUE)
