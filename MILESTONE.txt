@@ -1,0 +1,9 @@
+Changelog 12/10/2018 
+
+MILESTONE 1:
+
+-Created two rooms for the player to explore.
+-Added a player character object that can be controlled using the arrow keys
+-Updated movement to be more user-friendly.
+-Added player interactions that can be activated by pressing Z
+-Added a script-box popup for dialogue interactions. Press Z
