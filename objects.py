@@ -13,15 +13,13 @@ class DialogueObjects(arcade.Sprite):
     def deliverMessage(self, color):
         """Delivers the object's message when interacted with"""
         # displays a rectangle of a certain color at the bottom of the screen.
-        arcade.start_render()
+        #arcade.start_render()
 
         arcade.draw_rectangle_filled(self.screen_width//2, self.text_height//2, self.screen_width, self.text_height, color)
         
         # displays text inside the rectangle.
-        arcade.draw_text(self.message, 20, self.text_height - 35, arcade.color.BLACK, 16)
-        arcade.finish_render()
+        arcade.draw_text(self.message, 20, self.text_height - 35, arcade.color.WHITE, 16)
         #debug
-        print(self.message)
 
 
     def isColliding(self, player):
