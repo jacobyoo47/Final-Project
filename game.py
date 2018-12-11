@@ -102,9 +102,9 @@ def setup_room_1():
     portal.bottom = 6 * SPRITE_SIZE
     room.portal_list.append(portal)
 
-    box = objects.DialougeObjects("Images/Sign.png", SPRITE_SCALING, "Hello!")
+    box = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "Hello!", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
     box.left = 2 * SPRITE_SIZE
-    box.bottom = 14 * SPRITE_SIZE
+    box.bottom = 13 * SPRITE_SIZE
     room.wall_list.append(box)
     room.object_list.append(box)
 
@@ -227,7 +227,7 @@ class MyGame(arcade.Window):
         self.rooms[self.current_room].wall_list.draw()
 
         # Draw the text box/scrolling text (test)
-        scripts.displayTextBox('A box filled with nothing but cobwebs', SCREEN_WIDTH//2, TEXT_BOX_HEIGHT//2, SCREEN_WIDTH, TEXT_BOX_HEIGHT, arcade.color.DARK_BLUE)
+        #scripts.displayTextBox('A box filled with nothing but cobwebs', SCREEN_WIDTH//2, TEXT_BOX_HEIGHT//2, SCREEN_WIDTH, TEXT_BOX_HEIGHT, arcade.color.DARK_BLUE)
 
         # If you have coins or monsters, then copy and modify the line
         # above for each list.
@@ -346,7 +346,7 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                print(items.message)
+                items.deliverMessage(arcade.color.DARK_BLUE)
 
         
 
