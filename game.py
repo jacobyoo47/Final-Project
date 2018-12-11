@@ -385,7 +385,8 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                
+                self.player_sprite.change_x = 0
+                self.player_sprite.change_y = 0
                 self.current_message = items
                 self.state = DIALOGUE
                 # items.deliverMessage(arcade.color.DARK_BLUE)
