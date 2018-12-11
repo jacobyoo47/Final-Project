@@ -105,11 +105,18 @@ def setup_room_1():
     portal.bottom = 6 * SPRITE_SIZE
     room.portal_list.append(portal)
 
-    box = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "Hello!", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
+    box = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container. ", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
     box.left = 2 * SPRITE_SIZE
     box.bottom = 13 * SPRITE_SIZE
     room.wall_list.append(box)
     room.object_list.append(box)
+
+    box2 = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
+    box2.left = 4 * SPRITE_SIZE
+    box2.bottom = 13 * SPRITE_SIZE
+    room.wall_list.append(box2)
+    room.object_list.append(box2)
+
 
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
