@@ -21,6 +21,9 @@ SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 SCREEN_WIDTH = SPRITE_SIZE * 15
 SCREEN_HEIGHT = SPRITE_SIZE * 15
 
+GAME = 0
+DIALOGUE = 1
+
 MOVEMENT_SPEED = 5
 
 class Player(arcade.Sprite):
@@ -175,6 +178,11 @@ class MyGame(arcade.Window):
         # Sprite lists
         self.current_room = 0
 
+        #Setting the state of the game
+        self.level = GAME
+
+        self.current_message = None
+
         # Set up the player
         self.rooms = None
         self.score = 0
@@ -194,6 +202,9 @@ class MyGame(arcade.Window):
         self.player_list = arcade.SpriteList()
         self.player_list.append(self.player_sprite)
 
+        #Setting the state of the game
+        self.state = GAME
+
         # Our list of rooms
         self.rooms = []
 
@@ -210,14 +221,10 @@ class MyGame(arcade.Window):
         # Create a physics engine for this room
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
-
-    def on_draw(self):
+    def draw_game(self):
         """
         Render the screen.
         """
-
-        # This command has to happen before we start drawing
-        arcade.start_render()
 
         # Draw the background texture
         arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
@@ -235,68 +242,93 @@ class MyGame(arcade.Window):
 
         self.player_list.draw()
 
+    def draw_dialogue(self):
+        self.draw_game()
+        self.current_message.deliverMessage(arcade.color.DARK_BLUE)
+
+    def on_draw(self):
+        arcade.start_render()
+
+        if self.state == GAME:
+            self.draw_game()
+        elif self.state == DIALOGUE:
+            self.draw_dialogue()
+
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
         
         ## MOVEMENT:
-        if key == arcade.key.UP:
-            self.player_sprite.upMotion = True
-            self.player_sprite.change_y = MOVEMENT_SPEED
-        elif key == arcade.key.DOWN:
-            self.player_sprite.downMotion = True
-            self.player_sprite.change_y = -MOVEMENT_SPEED
-        elif key == arcade.key.LEFT:
+        if self.state == GAME:
+            if key == arcade.key.UP:
+                self.player_sprite.upMotion = True
+                self.player_sprite.change_y = MOVEMENT_SPEED
+            elif key == arcade.key.DOWN:
+                self.player_sprite.downMotion = True
+                self.player_sprite.change_y = -MOVEMENT_SPEED
+            elif key == arcade.key.LEFT:
+                
+                self.player_sprite.leftMotion = True
+                self.player_sprite.change_x = -MOVEMENT_SPEED
+            elif key == arcade.key.RIGHT:
             
-            self.player_sprite.leftMotion = True
-            self.player_sprite.change_x = -MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT:
-        
-            self.player_sprite.rightMotion = True
-            self.player_sprite.change_x = MOVEMENT_SPEED
+                self.player_sprite.rightMotion = True
+                self.player_sprite.change_x = MOVEMENT_SPEED
 
-        ## PLAYER INTERACTIONS:
-        elif key == arcade.key.Z:
-            self.player_sprite.useObject = True
+            ## PLAYER INTERACTIONS:
+            elif key == arcade.key.Z:
+                self.player_sprite.useObject = True
+        elif self.state == DIALOGUE:
+            if key == arcade.key.Z:
+                self.player_sprite.useObject = False
+                self.state = GAME
+
+        
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
 
         ## MOVEMENT:
-        if self.player_sprite.upMotion and self.player_sprite.downMotion:
-            if key == arcade.key.UP:
-                self.player_sprite.upMotion = False
-                self.player_sprite.change_y = -MOVEMENT_SPEED
-            elif key == arcade.key.DOWN:
-                self.player_sprite.downMotion = False
-                self.player_sprite.change_y = MOVEMENT_SPEED
-            elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
-                self.player_sprite.rightMotion = False
-                self.player_sprite.leftMotion = False
-                self.player_sprite.change_x = 0
-        elif self.player_sprite.leftMotion and self.player_sprite.rightMotion:
-            if key == arcade.key.RIGHT:
-                self.player_sprite.rightMotion = False
-                self.player_sprite.change_x = -MOVEMENT_SPEED
-            elif key == arcade.key.LEFT:
-                self.player_sprite.leftMotion = False
-                self.player_sprite.change_x = MOVEMENT_SPEED
+        if self.state == GAME:
+            if self.player_sprite.upMotion and self.player_sprite.downMotion:
+                if key == arcade.key.UP:
+                    self.player_sprite.upMotion = False
+                    self.player_sprite.change_y = -MOVEMENT_SPEED
+                elif key == arcade.key.DOWN:
+                    self.player_sprite.downMotion = False
+                    self.player_sprite.change_y = MOVEMENT_SPEED
+                elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+                    self.player_sprite.rightMotion = False
+                    self.player_sprite.leftMotion = False
+                    self.player_sprite.change_x = 0
+            elif self.player_sprite.leftMotion and self.player_sprite.rightMotion:
+                if key == arcade.key.RIGHT:
+                    self.player_sprite.rightMotion = False
+                    self.player_sprite.change_x = -MOVEMENT_SPEED
+                elif key == arcade.key.LEFT:
+                    self.player_sprite.leftMotion = False
+                    self.player_sprite.change_x = MOVEMENT_SPEED
+                elif key == arcade.key.UP or key == arcade.key.DOWN:
+                    self.player_sprite.upMotion = False
+                    self.player_sprite.downMotion = False
+                    self.player_sprite.change_y = 0
             elif key == arcade.key.UP or key == arcade.key.DOWN:
                 self.player_sprite.upMotion = False
                 self.player_sprite.downMotion = False
                 self.player_sprite.change_y = 0
-        elif key == arcade.key.UP or key == arcade.key.DOWN:
-            self.player_sprite.upMotion = False
-            self.player_sprite.downMotion = False
-            self.player_sprite.change_y = 0
-        elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
-            self.player_sprite.rightMotion = False
-            self.player_sprite.leftMotion = False
-            self.player_sprite.change_x = 0
-        
+            elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+                self.player_sprite.rightMotion = False
+                self.player_sprite.leftMotion = False
+                self.player_sprite.change_x = 0
+            
 
-        ## PLAYER INTERACTIONS
-        elif key == arcade.key.Z:
-            self.player_sprite.useObject = False
+            ## PLAYER INTERACTIONS
+            elif key == arcade.key.Z:
+                self.player_sprite.useObject = False
+
+        # elif self.state == DIALOGUE:
+        #     self.player_sprite.useObject = False
+        #     self.state = GAME
+
 
     def update(self, delta_time):
         """ Movement and game logic """
@@ -346,7 +378,10 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                items.deliverMessage(arcade.color.DARK_BLUE)
+                
+                self.current_message = items
+                self.state = DIALOGUE
+                # items.deliverMessage(arcade.color.DARK_BLUE)
 
         
 
