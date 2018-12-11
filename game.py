@@ -12,6 +12,7 @@ import os
 import scripts
 
 TEXT_BOX_HEIGHT = 100
+import objects
 
 SPRITE_SCALING = 5
 SPRITE_NATIVE_SIZE = 8
@@ -25,13 +26,13 @@ MOVEMENT_SPEED = 5
 class Player(arcade.Sprite):
     def __init__(self):
         """creates the character Sprite"""
-        super().__init__("Images/Character.png", SPRITE_SCALING)
+        super().__init__("Images/CharacterRight.png", SPRITE_SCALING)
         self.leftMotion = False
         self.rightMotion = False
         self.upMotion = False
         self.downMotion = False
         self.useObject = False
-
+        
 
 class Room:
     """
@@ -42,7 +43,7 @@ class Room:
         # You may want many lists. Lists for coins, monsters, etc.
         self.wall_list = None
         self.portal_list = None
-
+        self.object_list = None
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
@@ -65,6 +66,7 @@ def setup_room_1():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.portal_list = arcade.SpriteList()
+    room.object_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -100,6 +102,12 @@ def setup_room_1():
     portal.bottom = 6 * SPRITE_SIZE
     room.portal_list.append(portal)
 
+    box = objects.DialougeObjects("Images/Sign.png", SPRITE_SCALING, "Hello!")
+    box.left = 2 * SPRITE_SIZE
+    box.bottom = 14 * SPRITE_SIZE
+    room.wall_list.append(box)
+    room.object_list.append(box)
+
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
 
@@ -116,7 +124,7 @@ def setup_room_2():
     # Sprite lists
     room.wall_list = arcade.SpriteList()
     room.portal_list = arcade.SpriteList()
-
+    room.object_list = arcade.SpriteList()
     # -- Set up the walls
     # Create bottom and top row of boxes
     # This y loops a list of two, the coordinate 0, and just under the top of window
@@ -202,6 +210,7 @@ class MyGame(arcade.Window):
         # Create a physics engine for this room
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
 
+
     def on_draw(self):
         """
         Render the screen.
@@ -237,9 +246,11 @@ class MyGame(arcade.Window):
             self.player_sprite.downMotion = True
             self.player_sprite.change_y = -MOVEMENT_SPEED
         elif key == arcade.key.LEFT:
+            
             self.player_sprite.leftMotion = True
             self.player_sprite.change_x = -MOVEMENT_SPEED
         elif key == arcade.key.RIGHT:
+        
             self.player_sprite.rightMotion = True
             self.player_sprite.change_x = MOVEMENT_SPEED
 
@@ -332,6 +343,12 @@ class MyGame(arcade.Window):
         elif self.current_room == 0 and len(hit_list) > 0 and self.player_sprite.useObject == True: # len(hit_list) > 0 should be changed later on to be more specific
             self.current_room = 1
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+        #Object Interaction
+        for items in self.rooms[self.current_room].object_list:
+            if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
+                print(items.message)
+
+        
 
 def main():
     """ Main method """
