@@ -284,6 +284,8 @@ class MyGame(arcade.Window):
             ## PLAYER INTERACTIONS:
             elif key == arcade.key.Z:
                 self.player_sprite.useObject = True
+
+
         elif self.state == DIALOGUE:
             if key == arcade.key.Z:
                 self.player_sprite.useObject = False
@@ -333,8 +335,8 @@ class MyGame(arcade.Window):
                 self.player_sprite.useObject = False
 
         # elif self.state == DIALOGUE:
-        #     self.player_sprite.useObject = False
-        #     self.state = GAME
+        #     self.player_sprite.change_x = 0
+        #     self.player_sprite.change_y = 0
 
 
     def update(self, delta_time):
@@ -387,6 +389,10 @@ class MyGame(arcade.Window):
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
                 self.player_sprite.change_x = 0
                 self.player_sprite.change_y = 0
+                self.player_sprite.rightMotion = False
+                self.player_sprite.leftMotion = False
+                self.player_sprite.upMotion = False
+                self.player_sprite.downMotion = False
                 self.current_message = items
                 self.state = DIALOGUE
                 # items.deliverMessage(arcade.color.DARK_BLUE)
