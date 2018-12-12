@@ -30,10 +30,17 @@ class Player(arcade.Sprite):
     def __init__(self):
         """creates the character Sprite"""
         super().__init__("Images/CharacterRight.png", SPRITE_SCALING)
+        
+        #Motion variables
         self.leftMotion = False
         self.rightMotion = False
         self.upMotion = False
         self.downMotion = False
+
+        #Directional Facing
+        self.direction = "RIGHT"
+
+        #Interacting Variables
         self.useObject = False
         
 
@@ -267,17 +274,27 @@ class MyGame(arcade.Window):
         ## MOVEMENT:
         if self.state == GAME:
             if key == arcade.key.UP:
+                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
+                    self.player_sprite.direction = "UP"
+
                 self.player_sprite.upMotion = True
                 self.player_sprite.change_y = MOVEMENT_SPEED
             elif key == arcade.key.DOWN:
+                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
+                    self.player_sprite.direction = "DOWN"
+
                 self.player_sprite.downMotion = True
                 self.player_sprite.change_y = -MOVEMENT_SPEED
             elif key == arcade.key.LEFT:
-                
+                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
+                    self.player_sprite.direction = "LEFT"
+
                 self.player_sprite.leftMotion = True
                 self.player_sprite.change_x = -MOVEMENT_SPEED
             elif key == arcade.key.RIGHT:
-            
+                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
+                    self.player_sprite.direction = "RIGHT"
+                    
                 self.player_sprite.rightMotion = True
                 self.player_sprite.change_x = MOVEMENT_SPEED
 
@@ -396,6 +413,8 @@ class MyGame(arcade.Window):
                 self.current_message = items
                 self.state = DIALOGUE
                 # items.deliverMessage(arcade.color.DARK_BLUE)
+        
+        print(self.player_sprite.direction)
 
         
 

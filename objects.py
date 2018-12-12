@@ -24,10 +24,18 @@ class DialogueObjects(arcade.Sprite):
 
     def isColliding(self, player):
         """Takes a player and returns true if this object is in contact with the player"""
-        
-        if abs(super().right - player.right) <= 8 * player.scale and abs(super().top - player.top) < 6 * player.scale:
-            return True
-        elif abs(super().top - player.top) <= 8 * player.scale and abs(super().right - player.right) < 8 * player.scale:
-            return True
+        direction = player.direction
+        if direction == 'LEFT':
+            if super().right - player.left < player.scale and abs(super().top - player.top) < 2 * player.scale:
+                return True
+        elif direction == 'RIGHT':
+            if super().left - player.right < player.scale and abs(super().top - player.top) < 2 * player.scale:
+                return True
+        elif direction == 'DOWN':
+            if super().top - player.bottom < player.scale and abs(super().right - player.right) < 2 * player.scale:
+                return True
+        elif direction == 'UP':
+            if super().bottom - player.top < player.scale and abs(super().right - player.right) < 2 * player.scale:
+                return True
         else: 
             return False
