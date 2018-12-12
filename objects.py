@@ -1,6 +1,5 @@
 import arcade
 
-
 class DialogueObjects(arcade.Sprite):
     """Is an object that stores a message"""
     def __init__(self, image, scaling, message, SCREEN_WIDTH, TEXT_BOX_HEIGHT):
