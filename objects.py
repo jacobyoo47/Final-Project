@@ -1,5 +1,4 @@
 import arcade
-import scripts
 
 class DialogueObjects(arcade.Sprite):
     """Is an object that stores a message"""

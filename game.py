@@ -9,7 +9,6 @@ python -m arcade.examples.sprite_rooms
 import math
 import arcade
 import os
-import scripts
 
 TEXT_BOX_HEIGHT = 100
 import objects
@@ -42,7 +41,17 @@ class Player(arcade.Sprite):
 
         #Interacting Variables
         self.useObject = False
-        
+    
+    def update_animation(self):
+        if self.direction == 'LEFT':
+            self.texture = arcade.load_texture("Images/CharacterRight.png", mirrored = True, scale = SPRITE_SCALING)
+        elif self.direction == 'RIGHT':
+            self.texture = arcade.load_texture("Images/CharacterRight.png", scale = SPRITE_SCALING)
+        elif self.direction == 'DOWN':
+            self.texture = arcade.load_texture("Images/CharacterDown.png", scale = SPRITE_SCALING)
+        elif self.direction == 'UP':
+            self.texutre = arcade.load_texture("Images/CharacterUp.png", scale = SPRITE_SCALING)
+
 
 class Room:
     """
@@ -360,6 +369,8 @@ class MyGame(arcade.Window):
         """ Movement and game logic """
         ## TIME:
         self.total_time += delta_time
+
+        self.player_sprite.update_animation()
 
         #Normalizing diagonal movement.\:
         if self.player_sprite.upMotion:
