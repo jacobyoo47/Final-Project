@@ -37,7 +37,7 @@ class Player(arcade.Sprite):
         self.downMotion = False
 
         #Directional Facing
-        self.direction = "RIGHT"
+        self.direction = ["UP", "RIGHT"]
 
         #Interacting Variables
         self.useObject = False
@@ -283,26 +283,26 @@ class MyGame(arcade.Window):
         ## MOVEMENT:
         if self.state == GAME:
             if key == arcade.key.UP:
-                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
-                    self.player_sprite.direction = "UP"
+                if self.player_sprite.change_y == 0:
+                    self.player_sprite.direction[0] = "UP"
 
                 self.player_sprite.upMotion = True
                 self.player_sprite.change_y = MOVEMENT_SPEED
             elif key == arcade.key.DOWN:
-                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
-                    self.player_sprite.direction = "DOWN"
+                if self.player_sprite.change_y == 0:
+                    self.player_sprite.direction[0] = "DOWN"
 
                 self.player_sprite.downMotion = True
                 self.player_sprite.change_y = -MOVEMENT_SPEED
             elif key == arcade.key.LEFT:
-                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
-                    self.player_sprite.direction = "LEFT"
+                if self.player_sprite.change_x == 0 :
+                    self.player_sprite.direction[1] = "LEFT"
 
                 self.player_sprite.leftMotion = True
                 self.player_sprite.change_x = -MOVEMENT_SPEED
             elif key == arcade.key.RIGHT:
-                if self.player_sprite.change_x == 0 and self.player_sprite.change_y == 0:
-                    self.player_sprite.direction = "RIGHT"
+                if self.player_sprite.change_x == 0:
+                    self.player_sprite.direction[1] = "RIGHT"
                     
                 self.player_sprite.rightMotion = True
                 self.player_sprite.change_x = MOVEMENT_SPEED
@@ -425,7 +425,6 @@ class MyGame(arcade.Window):
                 self.state = DIALOGUE
                 # items.deliverMessage(arcade.color.DARK_BLUE)
         
-        print(self.player_sprite.direction)
 
         
 
