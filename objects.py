@@ -1,5 +1,5 @@
 import arcade
-import scripts
+
 
 class DialogueObjects(arcade.Sprite):
     """Is an object that stores a message"""
@@ -25,17 +25,17 @@ class DialogueObjects(arcade.Sprite):
     def isColliding(self, player):
         """Takes a player and returns true if this object is in contact with the player"""
         direction = player.direction
-        if direction == 'LEFT':
-            if super().right - player.left < player.scale and abs(super().top - player.top) < 2 * player.scale:
+        if direction[1] == 'LEFT':
+            if abs(player.left - super().right) < player.scale and abs(super().top - player.top) < 4 * player.scale:
                 return True
-        elif direction == 'RIGHT':
-            if super().left - player.right < player.scale and abs(super().top - player.top) < 2 * player.scale:
+        elif direction[1] == 'RIGHT':
+            if abs(super().left - player.right) < player.scale and abs(super().top - player.top) < 4 * player.scale:
                 return True
-        elif direction == 'DOWN':
-            if super().top - player.bottom < player.scale and abs(super().right - player.right) < 2 * player.scale:
+        if direction[0] == 'DOWN':
+            if abs(super().top - player.bottom) < player.scale and abs(super().right - player.right) < 4 * player.scale:
                 return True
-        elif direction == 'UP':
-            if super().bottom - player.top < player.scale and abs(super().right - player.right) < 2 * player.scale:
+        elif direction[0] == 'UP':
+            if abs(super().bottom - player.top) < player.scale and abs(super().right - player.right) < 4 * player.scale:
                 return True
         else: 
             return False
