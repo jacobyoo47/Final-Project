@@ -19,8 +19,8 @@ SPRITE_SCALING = 5
 SPRITE_NATIVE_SIZE = 8
 SPRITE_SIZE = int(SPRITE_NATIVE_SIZE * SPRITE_SCALING)
 
-SCREEN_WIDTH = SPRITE_SIZE * 15
-SCREEN_HEIGHT = SPRITE_SIZE * 15
+SCREEN_WIDTH = SPRITE_SIZE * 30
+SCREEN_HEIGHT = SPRITE_SIZE * 16
 
 #Game states
 GAME = 0
@@ -59,7 +59,7 @@ class Room:
     This class holds all the information about the
     different rooms.
     """
-    def __init__(self):
+    def __init__(self, ):
         # You may want many lists. Lists for coins, monsters, etc.
         self.wall_list = None
         self.portal_list = None
@@ -168,7 +168,7 @@ def setup_room_2():
             room.wall_list.append(wall)
 
     # Create left and right column of boxes
-    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+    for x in (0, SCREEN_WIDTH -  SPRITE_SIZE):
         # Loop for each box going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
             # Skip making a block 4 and 5 blocks up
