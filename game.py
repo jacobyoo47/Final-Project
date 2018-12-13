@@ -66,9 +66,11 @@ class Room:
         self.wall_list = None
         self.portal_list = None
         self.object_list = None
+        self.door_list = None
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
+        
 
 class Inventory:
     """Holds all the information about the player's inventory"""
@@ -77,7 +79,7 @@ class Inventory:
         self.screen_width = screen_width
         self.inv_height = inv_height
         self.center_height = center_height
-        self.item_list = ['KEY', 'KEY']
+        self.item_list = []
 
     def storeSprites(self):
         """Stores each item in the player's inventory as a sprite in item_sprites"""
@@ -92,6 +94,12 @@ class Inventory:
                 self.item_sprites.append(key)
             else:
                 continue
+    
+    def useItem(self):
+        """Uses up an item and removes from inventory"""
+        self.item_list.pop()
+        self.item_sprites = arcade.SpriteList()
+        self.storeSprites()
 
     def showInventory(self):
         """Draws the inventory and all its current components."""
@@ -121,6 +129,7 @@ def setup_room_1():
     room.wall_list = arcade.SpriteList()
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
+    room.door_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -151,13 +160,13 @@ def setup_room_1():
 
     # If you want coins or monsters in a level, then add that code here.
     # Make a portal
-    portal = Portal("gold_portal.png", SPRITE_SCALING)
+    portal = Portal("Images/gold_portal.png", SPRITE_SCALING)
     portal.left = 5 * SPRITE_SIZE
     portal.bottom = 6 * SPRITE_SIZE
     room.portal_list.append(portal)
 
     #Adding interactable objects
-    box = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container. ", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
+    box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", key = True)
     box.left = 2 * SPRITE_SIZE
     box.bottom = 13 * SPRITE_SIZE
     #Adding this object to the wall_list so that it can be drawn and have collision
@@ -165,12 +174,18 @@ def setup_room_1():
     room.object_list.append(box)
 
     #Same as the above
-    box2 = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
+    box2 = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ")
     box2.left = 4 * SPRITE_SIZE
     box2.bottom = 13 * SPRITE_SIZE
     room.wall_list.append(box2)
     room.object_list.append(box2)
 
+    door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True)
+    door1.left = 15*SPRITE_SIZE
+    door1.bottom = 5*SPRITE_SIZE
+    room.wall_list.append(door1)
+    room.door_list.append(door1)
+    room.object_list.append(door1)
 
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
@@ -189,6 +204,7 @@ def setup_room_2():
     room.wall_list = arcade.SpriteList()
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
+    room.door_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -305,10 +321,21 @@ class MyGame(arcade.Window):
         #Draws all player sprites
         self.player_list.draw()
 
+        self.rooms[self.current_room].door_list.draw()
+
     def draw_dialogue(self):
         """Draws the dialogue over the screen"""
         self.draw_game()
-        self.current_message.deliverMessage(arcade.color.DARK_BLUE)
+        """Delivers the object's message when interacted with"""
+
+        message = self.current_message.message
+        # displays a rectangle of a certain color at the bottom of the screen.
+        #arcade.start_render()
+        arcade.draw_rectangle_filled(SCREEN_WIDTH//2, TEXT_BOX_HEIGHT//2, SCREEN_WIDTH, TEXT_BOX_HEIGHT, arcade.color.DARK_BLUE)
+        
+        # displays text inside the rectangle.
+        arcade.draw_text(message, 20,  TEXT_BOX_HEIGHT - 35, arcade.color.WHITE, 16)
+
 
     def draw_inventory(self):
         self.draw_game()
@@ -358,13 +385,27 @@ class MyGame(arcade.Window):
                 self.player_sprite.useObject = True
             
             elif key == arcade.key.C:
+                #Ensuring there is no movement after opening the inventory
+                self.player_sprite.change_x = 0
+                self.player_sprite.change_y = 0
+                self.player_sprite.rightMotion = False
+                self.player_sprite.leftMotion = False
+                self.player_sprite.upMotion = False
+                self.player_sprite.downMotion = False
+
                 self.state = INVENTORY
 
         #Exiting the diaglogue stage
         elif self.state == DIALOGUE:
             if key == arcade.key.Z:
+                #Changing the dialouge if the object has another message
+                if self.current_message.otherMessage != None:
+                    self.current_message.changeMessage()
+    
+
                 self.player_sprite.useObject = False
                 self.state = GAME
+                
 
         elif self.state == INVENTORY:
             if key == arcade.key.C or key == arcade.key.X:
@@ -486,6 +527,20 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
+                #If the object has an item, update inventory
+                if items.key:
+                    items.key = False
+                    self.player_sprite.inventory.item_list.append('KEY')
+                
+                #Opening doors with a key
+                if items.lock and len(self.player_sprite.inventory.item_list) > 0:
+                    items.message = "Used the key."
+                    items.unlock()
+                    items.lock = False
+                    self.rooms[self.current_room].wall_list.remove(items)
+                    self.rooms[self.current_room].object_list.remove(items)
+                    self.player_sprite.inventory.useItem()
+                    
                 #Ensuring there is no movement after interacting with an object
                 self.player_sprite.change_x = 0
                 self.player_sprite.change_y = 0
@@ -493,8 +548,10 @@ class MyGame(arcade.Window):
                 self.player_sprite.leftMotion = False
                 self.player_sprite.upMotion = False
                 self.player_sprite.downMotion = False
-                #Changing the state of the game
+                
                 self.current_message = items
+
+                #Changing the state of the game
                 self.state = DIALOGUE
         
 

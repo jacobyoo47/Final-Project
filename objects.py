@@ -1,15 +1,18 @@
 import arcade
 
-class DialogueObjects(arcade.Sprite):
+class InteractObjects(arcade.Sprite):
     """Is an object that stores a message"""
-    def __init__(self, image, scaling, message, SCREEN_WIDTH, TEXT_BOX_HEIGHT, key = False):
+    def __init__(self, image, scaling, message, otherMessage = None, key = False, lock = False):
         super().__init__(image, scaling)
         self.message = message
         self.scaling = scaling
-        self.screen_width = SCREEN_WIDTH
-        self.text_height = TEXT_BOX_HEIGHT
+        self.otherMessage = otherMessage
         self.key = key
+        self.lock = lock
         
+    def changeMessage(self):
+        self.message = self.otherMessage
+
     def deliverMessage(self, color):
         """Delivers the object's message when interacted with"""
         # displays a rectangle of a certain color at the bottom of the screen.
@@ -21,6 +24,10 @@ class DialogueObjects(arcade.Sprite):
         arcade.draw_text(self.message, 20, self.text_height - 35, arcade.color.WHITE, 16)
         #debug
 
+    def unlock(self):
+        """Changes sprite image based if a key is brought to it"""
+        
+        self.texture = arcade.load_texture("Images/OpenDoor.png", mirrored = True, scale = self.scaling)
 
     def isColliding(self, player):
         """Takes a player and returns true if this object is in contact with the player"""
