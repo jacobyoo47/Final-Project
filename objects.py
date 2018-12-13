@@ -2,12 +2,13 @@ import arcade
 
 class DialogueObjects(arcade.Sprite):
     """Is an object that stores a message"""
-    def __init__(self, image, scaling, message, SCREEN_WIDTH, TEXT_BOX_HEIGHT):
+    def __init__(self, image, scaling, message, SCREEN_WIDTH, TEXT_BOX_HEIGHT, key = False):
         super().__init__(image, scaling)
         self.message = message
         self.scaling = scaling
         self.screen_width = SCREEN_WIDTH
         self.text_height = TEXT_BOX_HEIGHT
+        self.key = key
         
     def deliverMessage(self, color):
         """Delivers the object's message when interacted with"""
