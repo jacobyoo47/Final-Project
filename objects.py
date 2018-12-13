@@ -38,3 +38,8 @@ class DialogueObjects(arcade.Sprite):
                 return True
         else: 
             return False
+
+class invObject(arcade.Sprite):
+    """Object that can be stored in the inventory slot"""
+    def __init__(self, image, scaling):
+        super().__init__(image, scaling)

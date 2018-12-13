@@ -22,6 +22,7 @@ SCREEN_HEIGHT = SPRITE_SIZE * 15
 
 GAME = 0
 DIALOGUE = 1
+INVENTORY = 2
 
 MOVEMENT_SPEED = 5
 
@@ -35,6 +36,7 @@ class Player(arcade.Sprite):
         self.rightMotion = False
         self.upMotion = False
         self.downMotion = False
+        self.inventory = Inventory()
 
         #Directional Facing
         self.direction = ["UP", "RIGHT"]
@@ -61,6 +63,38 @@ class Room:
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
+
+class Inventory:
+    """Holds all the information about the player's inventory"""
+    def __init__(self, screen_width = SCREEN_WIDTH, center_height = SCREEN_HEIGHT - (TEXT_BOX_HEIGHT // 4), inv_height = TEXT_BOX_HEIGHT // 2):
+        self.item_sprites = arcade.SpriteList()
+        self.screen_width = screen_width
+        self.inv_height = inv_height
+        self.center_height = center_height
+        self.item_list = ['KEY', 'KEY']
+
+    def storeSprites(self):
+        """Stores each item in the player's inventory as a sprite in item_sprites"""
+        item_locations = [150, 200, 250]
+        location = 0
+        for item in self.item_list:
+            if item == 'KEY':
+                key = arcade.Sprite('Images/key.png', SPRITE_SCALING)
+                key.left = item_locations[location]
+                key.bottom = self.center_height - 20
+                location += 1
+                self.item_sprites.append(key)
+            else:
+                continue
+
+    def showInventory(self):
+        """Draws the inventory and all its current components."""
+        arcade.draw_rectangle_filled(self.screen_width//2, self.center_height, self.screen_width, self.inv_height, arcade.color.EGGPLANT)
+        arcade.draw_text('INVENTORY:', 20, self.center_height - 8, arcade.color.BLACK, 18)
+        self.storeSprites()
+        self.item_sprites.draw()
+        
+
 
 class Portal(arcade.Sprite):
     """
@@ -264,6 +298,11 @@ class MyGame(arcade.Window):
         self.draw_game()
         self.current_message.deliverMessage(arcade.color.DARK_BLUE)
 
+    def draw_inventory(self):
+        self.draw_game()
+        self.player_sprite.inventory.showInventory()
+        
+
     def on_draw(self):
         arcade.start_render()
 
@@ -271,6 +310,8 @@ class MyGame(arcade.Window):
             self.draw_game()
         elif self.state == DIALOGUE:
             self.draw_dialogue()
+        elif self.state == INVENTORY:
+            self.draw_inventory()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -305,6 +346,9 @@ class MyGame(arcade.Window):
             ## PLAYER INTERACTIONS:
             elif key == arcade.key.Z:
                 self.player_sprite.useObject = True
+            
+            elif key == arcade.key.C:
+                self.state = INVENTORY
 
 
         elif self.state == DIALOGUE:
@@ -312,6 +356,9 @@ class MyGame(arcade.Window):
                 self.player_sprite.useObject = False
                 self.state = GAME
 
+        elif self.state == INVENTORY:
+            if key == arcade.key.C or key == arcade.key.X:
+                self.state = GAME
         
 
     def on_key_release(self, key, modifiers):
