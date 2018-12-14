@@ -23,6 +23,7 @@ SCREEN_WIDTH = SPRITE_SIZE * 30
 SCREEN_HEIGHT = SPRITE_SIZE * 16
 
 #Game states
+START = -1
 GAME = 0
 DIALOGUE = 1
 INVENTORY = 2
@@ -66,9 +67,11 @@ class Room:
         self.wall_list = None
         self.portal_list = None
         self.object_list = None
+        self.door_list = None
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
+        
 
 class Inventory:
     """Holds all the information about the player's inventory"""
@@ -77,7 +80,7 @@ class Inventory:
         self.screen_width = screen_width
         self.inv_height = inv_height
         self.center_height = center_height
-        self.item_list = ['KEY', 'KEY']
+        self.item_list = []
 
     def storeSprites(self):
         """Stores each item in the player's inventory as a sprite in item_sprites"""
@@ -92,6 +95,12 @@ class Inventory:
                 self.item_sprites.append(key)
             else:
                 continue
+    
+    def useItem(self):
+        """Uses up an item and removes from inventory"""
+        self.item_list.pop()
+        self.item_sprites = arcade.SpriteList()
+        self.storeSprites()
 
     def showInventory(self):
         """Draws the inventory and all its current components."""
@@ -121,6 +130,7 @@ def setup_room_1():
     room.wall_list = arcade.SpriteList()
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
+    room.door_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -151,13 +161,13 @@ def setup_room_1():
 
     # If you want coins or monsters in a level, then add that code here.
     # Make a portal
-    portal = Portal("gold_portal.png", SPRITE_SCALING)
+    portal = Portal("Images/gold_portal.png", SPRITE_SCALING)
     portal.left = 5 * SPRITE_SIZE
     portal.bottom = 6 * SPRITE_SIZE
     room.portal_list.append(portal)
 
     #Adding interactable objects
-    box = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container. ", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
+    box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", key = True)
     box.left = 2 * SPRITE_SIZE
     box.bottom = 13 * SPRITE_SIZE
     #Adding this object to the wall_list so that it can be drawn and have collision
@@ -165,12 +175,18 @@ def setup_room_1():
     room.object_list.append(box)
 
     #Same as the above
-    box2 = objects.DialogueObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ", SCREEN_WIDTH, TEXT_BOX_HEIGHT)
+    box2 = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ")
     box2.left = 4 * SPRITE_SIZE
     box2.bottom = 13 * SPRITE_SIZE
     room.wall_list.append(box2)
     room.object_list.append(box2)
 
+    door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True)
+    door1.left = 15*SPRITE_SIZE
+    door1.bottom = 5*SPRITE_SIZE
+    room.wall_list.append(door1)
+    room.door_list.append(door1)
+    room.object_list.append(door1)
 
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
@@ -189,6 +205,7 @@ def setup_room_2():
     room.wall_list = arcade.SpriteList()
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
+    room.door_list = arcade.SpriteList()
 
     # -- Set up the walls
     # Create bottom and top row of boxes
@@ -223,6 +240,118 @@ def setup_room_2():
     return room
 
 
+
+class TextButton:
+    """ Text-based button """
+    def __init__(self,
+                 center_x, center_y,
+                 width, height,
+                 text,
+                 font_size=18,
+                 font_face="Arial",
+                 face_color=arcade.color.LIGHT_GRAY,
+                 highlight_color=arcade.color.WHITE,
+                 shadow_color=arcade.color.GRAY,
+                 button_height=2):
+        self.center_x = center_x
+        self.center_y = center_y
+        self.width = width
+        self.height = height
+        self.text = text
+        self.font_size = font_size
+        self.font_face = font_face
+        self.pressed = False
+        self.face_color = face_color
+        self.highlight_color = highlight_color
+        self.shadow_color = shadow_color
+        self.button_height = button_height
+
+    def draw(self):
+        """ Draw the button """
+        arcade.draw_rectangle_filled(self.center_x, self.center_y, self.width,
+                                     self.height, self.face_color)
+
+        if not self.pressed:
+            color = self.shadow_color
+        else:
+            color = self.highlight_color
+
+        # Bottom horizontal
+        arcade.draw_line(self.center_x - self.width / 2, self.center_y - self.height / 2,
+                         self.center_x + self.width / 2, self.center_y - self.height / 2,
+                         color, self.button_height)
+
+        # Right vertical
+        arcade.draw_line(self.center_x + self.width / 2, self.center_y - self.height / 2,
+                         self.center_x + self.width / 2, self.center_y + self.height / 2,
+                         color, self.button_height)
+
+        if not self.pressed:
+            color = self.highlight_color
+        else:
+            color = self.shadow_color
+
+        # Top horizontal
+        arcade.draw_line(self.center_x - self.width / 2, self.center_y + self.height / 2,
+                         self.center_x + self.width / 2, self.center_y + self.height / 2,
+                         color, self.button_height)
+
+        # Left vertical
+        arcade.draw_line(self.center_x - self.width / 2, self.center_y - self.height / 2,
+                         self.center_x - self.width / 2, self.center_y + self.height / 2,
+                         color, self.button_height)
+
+        x = self.center_x
+        y = self.center_y
+        if not self.pressed:
+            x -= self.button_height
+            y += self.button_height
+
+        arcade.draw_text(self.text, x, y,
+                         arcade.color.BLACK, font_size=self.font_size,
+                         width=self.width, align="center",
+                         anchor_x="center", anchor_y="center")
+
+    def on_press(self):
+        self.pressed = True
+
+    def on_release(self):
+        self.pressed = False
+
+
+def check_mouse_press_for_buttons(x, y, button_list):
+    """ Given an x, y, see if we need to register any button clicks. """
+    for button in button_list:
+        if x > button.center_x + button.width / 2:
+            continue
+        if x < button.center_x - button.width / 2:
+            continue
+        if y > button.center_y + button.height / 2:
+            continue
+        if y < button.center_y - button.height / 2:
+            continue
+        button.on_press()
+
+
+def check_mouse_release_for_buttons(x, y, button_list):
+    """ If a mouse button has been released, see if we need to process
+        any release events. """
+    for button in button_list:
+        if button.pressed:
+            button.on_release()
+
+
+class StartTextButton(TextButton):
+    def __init__(self, center_x, center_y, action_function):
+        super().__init__(center_x, center_y, 100, 40, "Start", 18, "Arial")
+        self.action_function = action_function
+
+    def on_release(self):
+        super().on_release()
+        self.action_function()
+
+
+
 class MyGame(arcade.Window):
     """ Main application class. """
     
@@ -238,6 +367,9 @@ class MyGame(arcade.Window):
         # as mentioned at the top of this program.
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
+
+        # Button list
+        self.button_list = None
 
         # Sprite lists
         self.current_room = 0
@@ -268,7 +400,13 @@ class MyGame(arcade.Window):
         self.player_list.append(self.player_sprite)
 
         #Setting the state of the game
-        self.state = GAME
+        self.state = START
+
+        # Our button list
+        self.button_list = []
+        
+        start_button = StartTextButton(60, 570, self.start_game)
+        self.button_list.append(start_button)
 
         # Our list of rooms
         self.rooms = []
@@ -285,6 +423,19 @@ class MyGame(arcade.Window):
 
         # Create a physics engine for this room
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+
+    def start_game(self):
+        """
+        Start the game
+        """
+        self.state = GAME
+
+    def draw_start(self):
+        """
+        Draw the start menu
+        """
+        for button in self.button_list:
+            button.draw()
 
     def draw_game(self):
         """
@@ -305,10 +456,21 @@ class MyGame(arcade.Window):
         #Draws all player sprites
         self.player_list.draw()
 
+        self.rooms[self.current_room].door_list.draw()
+
     def draw_dialogue(self):
         """Draws the dialogue over the screen"""
         self.draw_game()
-        self.current_message.deliverMessage(arcade.color.DARK_BLUE)
+        """Delivers the object's message when interacted with"""
+
+        message = self.current_message.message
+        # displays a rectangle of a certain color at the bottom of the screen.
+        #arcade.start_render()
+        arcade.draw_rectangle_filled(SCREEN_WIDTH//2, TEXT_BOX_HEIGHT//2, SCREEN_WIDTH, TEXT_BOX_HEIGHT, arcade.color.DARK_BLUE)
+        
+        # displays text inside the rectangle.
+        arcade.draw_text(message, 20,  TEXT_BOX_HEIGHT - 35, arcade.color.WHITE, 16)
+
 
     def draw_inventory(self):
         self.draw_game()
@@ -319,7 +481,10 @@ class MyGame(arcade.Window):
         """Draws the things on the screen"""
         arcade.start_render()
 
-        if self.state == GAME:
+        if self.state == START:
+            self.draw_start()
+
+        elif self.state == GAME:
             self.draw_game()
 
         elif self.state == DIALOGUE:
@@ -358,13 +523,27 @@ class MyGame(arcade.Window):
                 self.player_sprite.useObject = True
             
             elif key == arcade.key.C:
+                #Ensuring there is no movement after opening the inventory
+                self.player_sprite.change_x = 0
+                self.player_sprite.change_y = 0
+                self.player_sprite.rightMotion = False
+                self.player_sprite.leftMotion = False
+                self.player_sprite.upMotion = False
+                self.player_sprite.downMotion = False
+
                 self.state = INVENTORY
 
         #Exiting the diaglogue stage
         elif self.state == DIALOGUE:
             if key == arcade.key.Z:
+                #Changing the dialouge if the object has another message
+                if self.current_message.otherMessage != None:
+                    self.current_message.changeMessage()
+    
+
                 self.player_sprite.useObject = False
                 self.state = GAME
+                
 
         elif self.state == INVENTORY:
             if key == arcade.key.C or key == arcade.key.X:
@@ -430,6 +609,17 @@ class MyGame(arcade.Window):
             elif key == arcade.key.Z:
                 self.player_sprite.useObject = False
 
+    def on_mouse_press(self, x, y, button, key_modifiers):
+        """
+        Called when the user presses a mouse button.
+        """
+        check_mouse_press_for_buttons(x, y, self.button_list)
+
+    def on_mouse_release(self, x, y, button, key_modifiers):
+        """
+        Called when a user releases a mouse button.
+        """
+        check_mouse_release_for_buttons(x, y, self.button_list)
 
     def update(self, delta_time):
         """ Movement and game logic """
@@ -486,6 +676,20 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
+                #If the object has an item, update inventory
+                if items.key:
+                    items.key = False
+                    self.player_sprite.inventory.item_list.append('KEY')
+                
+                #Opening doors with a key
+                if items.lock and len(self.player_sprite.inventory.item_list) > 0:
+                    items.message = "Used the key."
+                    items.unlock()
+                    items.lock = False
+                    self.rooms[self.current_room].wall_list.remove(items)
+                    self.rooms[self.current_room].object_list.remove(items)
+                    self.player_sprite.inventory.useItem()
+                    
                 #Ensuring there is no movement after interacting with an object
                 self.player_sprite.change_x = 0
                 self.player_sprite.change_y = 0
@@ -493,8 +697,10 @@ class MyGame(arcade.Window):
                 self.player_sprite.leftMotion = False
                 self.player_sprite.upMotion = False
                 self.player_sprite.downMotion = False
-                #Changing the state of the game
+                
                 self.current_message = items
+
+                #Changing the state of the game
                 self.state = DIALOGUE
         
 
