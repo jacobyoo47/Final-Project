@@ -133,6 +133,14 @@ def setup_room_1():
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
 
+    # Draw background
+    for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
+        for y in range(0, SCREEN_HEIGHT, SPRITE_SIZE):
+            floor = arcade.Sprite("Images/RogueSprites/floor.png", SPRITE_SCALING)
+            floor.left = x
+            floor.bottom = y
+            room.transparent_list.append(floor)
+
     # -- Set up the walls
     # Create bottom and top row of boxes
     # This y loops a list of two, the coordinate 0, and just under the top of window
@@ -216,12 +224,20 @@ def setup_room_1():
     room.wall_list.append(box2)
     room.object_list.append(box2)
 
+    # Crates
+    crate1 = objects.InteractObjects("Images/barrel.png", SPRITE_SCALING, "A sturdy wooden crate. ")
+    crate1.left = 3 * SPRITE_SIZE
+    crate1.bottom = 5 * SPRITE_SIZE
+    room.wall_list.append(crate1)
+    room.object_list.append(crate1)
+
     # Creating starting note
     note1 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Sometimes, backtracking is necessary.")
     note1.left = 4 * SPRITE_SIZE
-    note1.bottom = 2 * SPRITE_SIZE
+    note1.bottom = 1 * SPRITE_SIZE
     room.object_list.append(note1)
-    room.transparent_list.append(note1)
+    #room.transparent_list.append(note1)
+    room.wall_list.append(note1)
 
     # Creating doors:
     door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
@@ -244,6 +260,14 @@ def setup_room_1():
     room.wall_list.append(door3)
     room.door_list.append(door3)
     room.object_list.append(door3)
+
+    # Furniture
+    bed = objects.InteractObjects("Images/bed.png", SPRITE_SCALING, "A filthy bed... Looks like there's a key hidden beneath the blanket.", otherMessage="A filthy bed.", key = True)
+    bed.left = 1 * SPRITE_SIZE
+    bed.bottom = 1 * SPRITE_SIZE
+    room.wall_list.append(bed)
+    room.object_list.append(bed)
+
 
     #door4 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, 'Opened the door.', door = True)
     #door4.left = 5*SPRITE_SIZE
@@ -509,8 +533,12 @@ class MyGame(arcade.Window):
         """
 
         # Draw the background texture
-        arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
-                                      SCREEN_WIDTH, SCREEN_HEIGHT, self.rooms[self.current_room].background)
+
+        self.rooms[self.current_room].transparent_list.draw()
+
+        #arcade.draw_texture_rectangle(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
+        #                              SCREEN_WIDTH, SCREEN_HEIGHT, self.rooms[self.current_room].background)
+
 
         # Draw all the walls in this room
         self.rooms[self.current_room].wall_list.draw()
@@ -519,8 +547,6 @@ class MyGame(arcade.Window):
         # above for each list.
         self.rooms[self.current_room].portal_list.draw()
 
-        #Draw the note sprite
-        self.rooms[self.current_room].transparent_list.draw()
 
         #Draws all player sprites
         self.player_list.draw()
