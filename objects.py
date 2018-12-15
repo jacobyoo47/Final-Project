@@ -56,21 +56,28 @@ class InteractObjects(arcade.Sprite):
             return False
 
 class Switch(arcade.Sprite):
-    def __init__(self, scaling):
-        super().__init__('Images/lever_left.png', scaling)
+    def __init__(self, scaling, orientation = 'LEFT'):
         self.scaling = scaling
-        self.orientation = 'LEFT'
+        self.orientation = orientation
+        self.message = None
+
+        if self.orientation != 'BROKEN':
+            super().__init__('Images/lever_left.png', scaling)
+            self.message = 'A lever, but it\'s missing the handle.'
+        else:
+            super().__init__('Images/lever_broken.png', scaling)
 
     def toggleSwitch(self):
-        if self.orientation == 'LEFT':
-            self.texture = arcade.load_texture("Images/lever_neutral.png",scale = self.scaling)
-            self.orientation = 'NEUTRAL'
-        elif self.orientation == 'NEUTRAL':
-            self.texture = arcade.load_texture("Images/lever_right.png", scale = self.scaling)
-            self.orientation = 'RIGHT'
-        else:
-            self.texture = arcade.load_texture("Images/lever_left.png", scale = self.scaling)
-            self.orientation = 'LEFT'
+        if self.orientation != 'BROKEN':
+            if self.orientation == 'LEFT':
+                self.texture = arcade.load_texture("Images/lever_neutral.png",scale = self.scaling)
+                self.orientation = 'NEUTRAL'
+            elif self.orientation == 'NEUTRAL':
+                self.texture = arcade.load_texture("Images/lever_right.png", scale = self.scaling)
+                self.orientation = 'RIGHT'
+            else:
+                self.texture = arcade.load_texture("Images/lever_left.png", scale = self.scaling)
+                self.orientation = 'LEFT'
 
 
     def isColliding(self, player):
