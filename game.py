@@ -27,6 +27,7 @@ START = -1
 GAME = 0
 DIALOGUE = 1
 INVENTORY = 2
+INSTRUCTIONS = 3
 
 #Inherent traits of player
 MOVEMENT_SPEED = 5
@@ -102,6 +103,10 @@ class Inventory:
                 crowbar.bottom = self.center_height - 20
                 location += 1
                 self.item_sprites.append(crowbar)
+            elif item == 'BROKEN_LEVER':
+                lever = arcade.Sprite('Images/lever_handle.png', SPRITE_SCALING)
+                lever.left = item_locations[location]
+                lever.bottom = self.center_height - 20
     
     def useItem(self, item):
         """Uses up an item and removes from inventory"""
@@ -172,7 +177,7 @@ def setup_room_1():
         wall.left = x
         wall.bottom = 6 * SPRITE_SIZE
         room.wall_list.append(wall)
-    for y in range(0, 5 * SPRITE_SIZE, SPRITE_SIZE):
+    for y in range(0, 6 * SPRITE_SIZE, SPRITE_SIZE):
         if (y != SPRITE_SIZE * 3):
             wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
             wall.left = 5 * SPRITE_SIZE
@@ -235,7 +240,7 @@ def setup_room_1():
         room.portal_list.append(portal)
 
     # Adding interactable objects
-    box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", key = True)
+    box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", hasItem = 'KEY')
     box.left = 2 * SPRITE_SIZE
     box.bottom = 13 * SPRITE_SIZE
     # Adding this object to the wall_list so that it can be drawn and have collision
@@ -250,7 +255,7 @@ def setup_room_1():
     room.object_list.append(box2)
 
     # Crates
-    crate1 = objects.InteractObjects("Images/barrel.png", SPRITE_SCALING, "A moldy wooden crate. ", breakable=True, key=True)
+    crate1 = objects.InteractObjects("Images/barrel.png", SPRITE_SCALING, "A moldy wooden crate. ", breakable=True, hasItem = 'KEY')
     crate1.left = 3 * SPRITE_SIZE
     crate1.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(crate1)
@@ -287,13 +292,13 @@ def setup_room_1():
     room.object_list.append(door3)
 
     # Furniture/Items
-    bed = objects.InteractObjects("Images/bed.png", SPRITE_SCALING, "A filthy bed... Looks like there's a key hidden beneath the blanket.", otherMessage="A filthy bed.", key = True)
+    bed = objects.InteractObjects("Images/bed.png", SPRITE_SCALING, "A filthy bed... Looks like there's a key hidden beneath the blanket.", otherMessage="A filthy bed.", hasItem = 'KEY')
     bed.left = 1 * SPRITE_SIZE
     bed.bottom = 1 * SPRITE_SIZE
     room.wall_list.append(bed)
     room.object_list.append(bed)
 
-    crowbar = objects.InteractObjects("Images/crowbar.png", SPRITE_SCALING, "A brittle, rusty crowbar.", crowbar = True)
+    crowbar = objects.InteractObjects("Images/crowbar.png", SPRITE_SCALING, "A brittle, rusty crowbar.", hasItem = 'CROWBAR')
     crowbar.left = 2 * SPRITE_SIZE
     crowbar.bottom = 7 * SPRITE_SIZE
     room.wall_list.append(crowbar)
@@ -306,7 +311,12 @@ def setup_room_1():
     room.wall_list.append(switch1)
     room.switch_list.append(switch1)
 
-    
+    broken_lever = objects.InteractObjects('Images/lever_handle.png', SPRITE_SCALING, "A lever handle.", hasItem = 'BROKEN_LEVER')
+    broken_lever.left = 18 * SPRITE_SIZE
+    broken_lever.bottom = 9 * SPRITE_SIZE
+    room.wall_list.append(broken_lever)
+    room.switch_list.append(broken_lever)
+
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
 
@@ -462,8 +472,8 @@ def check_mouse_release_for_buttons(x, y, button_list):
 
 
 class StartTextButton(TextButton):
-    def __init__(self, center_x, center_y, action_function):
-        super().__init__(center_x, center_y, 100, 40, "Start", 18, "Arial")
+    def __init__(self, center_x, center_y, width, text, action_function):
+        super().__init__(center_x, center_y, width, 40, text, 18, "Arial")
         self.action_function = action_function
 
     def on_release(self):
@@ -488,8 +498,6 @@ class MyGame(arcade.Window):
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
 
-        # Button list
-        self.button_list = None
 
         # Sprite lists
         self.current_room = 0
@@ -524,11 +532,17 @@ class MyGame(arcade.Window):
         self.state = START
 
         # Our button list
-        self.button_list = []
+        self.button_list_start = []
+        self.button_list_howTo = []
         
-        start_button = StartTextButton(600, 75, self.start_game)
-        self.button_list.append(start_button)
+        start_button = StartTextButton(950, 350, 100, 'Start', self.start_game)
+        self.button_list_start.append(start_button)
 
+        how_to_play = StartTextButton(950, 250, 150, 'How To Play', self.show_instructions)
+        self.button_list_start.append(how_to_play)
+
+        back_to_menu = StartTextButton(600, 75, 100, 'Return', self.show_start)
+        self.button_list_howTo.append(back_to_menu)
         # Our list of rooms
         self.rooms = []
 
@@ -551,12 +565,35 @@ class MyGame(arcade.Window):
         """
         self.state = GAME
 
+    def show_instructions(self):
+        """
+        start instruction screen
+        """
+        self.state = INSTRUCTIONS
+
+    def show_start(self):
+        """
+        show start menu
+        """
+        self.state = START
+
     def draw_start(self):
         """
         Draw the start menu
         """
-        for button in self.button_list:
+        arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, arcade.load_texture("Images/minecraft.jpg"))
+
+        for button in self.button_list_start:
             button.draw()
+    
+    def draw_instructions(self):
+        """
+        Draw the instructions menu
+        """
+
+
+        # background
+        arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, arcade.load_texture("Images/tutorial.jpg"))
 
         arcade.draw_text("INSTRUCTIONS", SCREEN_WIDTH // 2, 550,
                          arcade.color.WHITE, font_size=40,
@@ -566,14 +603,17 @@ class MyGame(arcade.Window):
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Use \"Z\" to interact with objects", SCREEN_WIDTH // 2, 450,
+        arcade.draw_text("Press \"Z\" to interact with objects while facing them", SCREEN_WIDTH // 2, 450,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Use \"C\" to show the inventory", SCREEN_WIDTH // 2, 400,
+        arcade.draw_text("Press \"C\" to show the inventory", SCREEN_WIDTH // 2, 400,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
+
+        for button in self.button_list_howTo:
+            button.draw()
 
     def draw_game(self):
         """
@@ -634,8 +674,12 @@ class MyGame(arcade.Window):
 
         elif self.state == DIALOGUE:
             self.draw_dialogue()
+
         elif self.state == INVENTORY:
             self.draw_inventory()
+
+        elif self.state == INSTRUCTIONS:
+            self.draw_instructions()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -760,13 +804,19 @@ class MyGame(arcade.Window):
         """
         Called when the user presses a mouse button.
         """
-        check_mouse_press_for_buttons(x, y, self.button_list)
+        if self.state == START:
+            check_mouse_press_for_buttons(x, y, self.button_list_start)
+        elif self.state == INSTRUCTIONS:
+            check_mouse_press_for_buttons(x, y, self.button_list_howTo)
 
     def on_mouse_release(self, x, y, button, key_modifiers):
         """
         Called when a user releases a mouse button.
         """
-        check_mouse_release_for_buttons(x, y, self.button_list)
+        if self.state == START:
+            check_mouse_release_for_buttons(x, y, self.button_list_start)
+        elif self.state == INSTRUCTIONS:
+            check_mouse_release_for_buttons(x, y, self.button_list_howTo)
 
     def update(self, delta_time):
         """ Movement and game logic """
@@ -829,13 +879,13 @@ class MyGame(arcade.Window):
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
                 print(self.player_sprite.inventory.item_list)
                 #If the object has a key, update inventory
-                if items.key and not items.breakable:
-                    items.key = False
+                if items.hasItem == 'KEY' and not items.breakable:
+                    items.hasItem = None
                     self.player_sprite.inventory.item_list.append('KEY')
 
                 #If the object has a crowbar, update inventory
-                if items.crowbar and not items.breakable:
-                    items.crowbar = False
+                if items.hasItem == 'CROWBAR' and not items.breakable:
+                    items.hasItem = None
                     self.rooms[self.current_room].wall_list.remove(items)
                     self.rooms[self.current_room].object_list.remove(items)
                     self.player_sprite.inventory.item_list.append('CROWBAR')
@@ -851,10 +901,10 @@ class MyGame(arcade.Window):
                     self.player_sprite.inventory.useItem('KEY')
 
                 #Breaking crates with a crowbar
-                if items.breakable and 'CROWBAR' in (self.player_sprite.inventory.item_list) and items.key:
+                if items.breakable and 'CROWBAR' in (self.player_sprite.inventory.item_list) and items.hasItem == 'KEY':
                     items.message = "Smashed the crate with the crowbar, Gordon Freeman style. There was a key inside."
                     items.broken()
-                    items.key = False
+                    items.hasItem = None
                     items.breakable = False
                     self.onCrate = True
                     self.rooms[self.current_room].wall_list.remove(items)

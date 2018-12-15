@@ -2,16 +2,15 @@ import arcade
 
 class InteractObjects(arcade.Sprite):
     """Is an object that stores a message"""
-    def __init__(self, image, scaling, message, otherMessage = None, key = False, lock = False, door = False, breakable = False, crowbar = False):
+    def __init__(self, image, scaling, message, otherMessage = None, hasItem = None, lock = False, door = False, breakable = False):
         super().__init__(image, scaling)
         self.message = message
         self.scaling = scaling
         self.otherMessage = otherMessage
-        self.key = key
+        self.hasItem = hasItem
         self.lock = lock
         self.door = door
         self.breakable = breakable
-        self.crowbar = crowbar
 
     def changeMessage(self):
         self.message = self.otherMessage
