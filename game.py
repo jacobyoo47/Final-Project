@@ -234,7 +234,7 @@ def setup_room_1():
     # Make portals
     start_xList = [3,3,4,4,4,6,6,7,8,8,9,9,10,11,11,11,12,13,13,14]
     start_yList = [1,10,4,11,14,3,9,1,3,10,7,12,4,3,5,9,10,3,7,14]
-    end_xList = [6,11,6,9,8,4,3,9,4,10,4,7,6,12,3,13,11,11,14,13]
+    end_xList = [6,11,6,9,8,4,3,9,4,10,4,7,8,12,3,13,11,11,14,13]
     end_yList = [9,5,3,7,3,4,1,12,14,4,11,1,10,10,10,3,3,9,14,7]
     for i in range(len(start_xList)):
         portal = Portal()
@@ -1000,6 +1000,7 @@ class MyGame(arcade.Window):
                 password.append(switch.orientation)
             if type(self.rooms[self.current_room].password[0]) == list:
                 if password == self.rooms[self.current_room].password[0]:
+
                     self.rooms[self.current_room].secret_item.hasItem = 'KEY'
                     self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
@@ -1007,6 +1008,7 @@ class MyGame(arcade.Window):
                     print(self.rooms[self.current_room].password)
             else:
                 if password == self.rooms[self.current_room].password:
+
                     self.rooms[self.current_room].secret_item.hasItem = 'KEY'
                     self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
