@@ -2,7 +2,7 @@ import arcade
 
 class InteractObjects(arcade.Sprite):
     """Is an object that stores a message"""
-    def __init__(self, image, scaling, message, otherMessage = None, key = False, lock = False, door = False, breakable = False, crowbar = False):
+    def __init__(self, image, scaling, message, otherMessage = None, key = False, lock = False, door = False, breakable = False, crowbar = False, disappears = False):
         super().__init__(image, scaling)
         self.message = message
         self.scaling = scaling
@@ -12,6 +12,7 @@ class InteractObjects(arcade.Sprite):
         self.door = door
         self.breakable = breakable
         self.crowbar = crowbar
+        self.disappears = disappears
 
     def changeMessage(self):
         self.message = self.otherMessage
@@ -57,19 +58,20 @@ class InteractObjects(arcade.Sprite):
 
 class Switch(arcade.Sprite):
     def __init__(self, scaling):
-        super().__init__('Images/lever_neutral.png', scaling)
+        super().__init__('Images/lever_left.png', scaling)
         self.scaling = scaling
-        self.orientation = 0
+        self.orientation = 'LEFT'
 
     def toggleSwitch(self):
-        self.orientation += 1
-        state = self.orientation % 3
-        if state == 0:
-            self.texture = arcade.load_texture("Images/lever_neutral.png", mirrored = True, scale = self.scaling)
-        elif state == 1:
-            self.texture = arcade.load_texture("Images/lever_right.png", mirrored = True, scale = self.scaling)
+        if self.orientation == 'LEFT':
+            self.texture = arcade.load_texture("Images/lever_neutral.png",scale = self.scaling)
+            self.orientation = 'NEUTRAL'
+        elif self.orientation == 'NEUTRAL':
+            self.texture = arcade.load_texture("Images/lever_right.png", scale = self.scaling)
+            self.orientation = 'RIGHT'
         else:
-            self.texture = arcade.load_texture("Images/lever_left.png", mirrored = True, scale = self.scaling)
+            self.texture = arcade.load_texture("Images/lever_left.png", scale = self.scaling)
+            self.orientation = 'LEFT'
 
 
     def isColliding(self, player):
@@ -90,8 +92,3 @@ class Switch(arcade.Sprite):
         else: 
             return False
         
-
-class invObject(arcade.Sprite):
-    """Object that can be stored in the inventory slot"""
-    def __init__(self, image, scaling):
-        super().__init__(image, scaling)
