@@ -321,7 +321,7 @@ def setup_room_1():
     broken_lever.left = 18 * SPRITE_SIZE
     broken_lever.bottom = 9 * SPRITE_SIZE
     room.wall_list.append(broken_lever)
-    room.switch_list.append(broken_lever)
+    room.object_list.append(broken_lever)
     
     switch2 = objects.Switch(SPRITE_SCALING)
     switch2.left = 4 * SPRITE_SIZE
@@ -348,7 +348,7 @@ def setup_room_1():
     room.switch_list.append(switch5)
 
     #The key that comes from these switches
-    room.secret_item = crowbar = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "A key appeared.", key = True, disappears= True)
+    room.secret_item = crowbar = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "A key appeared.", hasItem = 'KEY', disappears= True)
     room.secret_item.left = 11 * SPRITE_SIZE
     room.secret_item.bottom = 14 * SPRITE_SIZE
     
