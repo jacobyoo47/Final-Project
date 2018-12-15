@@ -25,7 +25,7 @@ class InteractObjects(arcade.Sprite):
         
         # displays text inside the rectangle.
         arcade.draw_text(self.message, 20, self.text_height - 35, arcade.color.WHITE, 16)
-        #debug
+
 
     def unlock(self):
         """Changes sprite image based if a key is brought to it"""
