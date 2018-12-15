@@ -234,7 +234,7 @@ def setup_room_1():
     # Make portals
     start_xList = [3,3,4,4,4,6,6,7,8,8,9,9,10,11,11,11,12,13,13,14]
     start_yList = [1,10,4,11,14,3,9,1,3,10,7,12,4,3,5,9,10,3,7,14]
-    end_xList = [6,11,6,9,8,4,3,9,4,10,4,7,6,12,3,13,11,11,14,13]
+    end_xList = [6,11,6,9,8,4,3,9,4,10,4,7,8,12,3,13,11,11,14,13]
     end_yList = [9,5,3,7,3,4,1,12,14,4,11,1,10,10,10,3,3,9,14,7]
     for i in range(len(start_xList)):
         portal = Portal()
@@ -247,19 +247,19 @@ def setup_room_1():
         room.portal_list.append(portal)
 
     # Adding interactable objects
-    box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", hasItem = 'KEY')
-    box.left = 2 * SPRITE_SIZE
-    box.bottom = 13 * SPRITE_SIZE
+    #box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", hasItem = 'KEY')
+    #box.left = 2 * SPRITE_SIZE
+    #box.bottom = 13 * SPRITE_SIZE
     # Adding this object to the wall_list so that it can be drawn and have collision
-    room.wall_list.append(box)
-    room.object_list.append(box)
+    #room.wall_list.append(box)
+    #room.object_list.append(box)
 
     # Same as the above
-    box2 = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ")
-    box2.left = 4 * SPRITE_SIZE
-    box2.bottom = 13 * SPRITE_SIZE
-    room.wall_list.append(box2)
-    room.object_list.append(box2)
+    #box2 = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ")
+    #box2.left = 4 * SPRITE_SIZE
+    #box2.bottom = 13 * SPRITE_SIZE
+    #room.wall_list.append(box2)
+    #room.object_list.append(box2)
 
     # Crates
     crate1 = objects.InteractObjects("Images/barrel.png", SPRITE_SCALING, "A moldy wooden crate. ", breakable=True, hasItem = 'KEY')
@@ -276,6 +276,11 @@ def setup_room_1():
     #room.transparent_list.append(note1)
     room.wall_list.append(note1)
 
+    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Two hooded figures bow to a monument in the east, while the third one flees.")
+    note2.left = 5 * SPRITE_SIZE
+    note2.bottom = 13 * SPRITE_SIZE
+    room.object_list.append(note2)
+    room.wall_list.append(note2)
     # Creating doors:
     door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
     door1.left = 14*SPRITE_SIZE
@@ -297,6 +302,13 @@ def setup_room_1():
     room.wall_list.append(door3)
     room.door_list.append(door3)
     room.object_list.append(door3)
+
+    doorfinal = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
+    doorfinal.left = 24*SPRITE_SIZE
+    doorfinal.bottom = 15*SPRITE_SIZE
+    room.wall_list.append(doorfinal)
+    room.door_list.append(doorfinal)
+    room.object_list.append(doorfinal)
 
     # Furniture/Items
     bed = objects.InteractObjects("Images/bed.png", SPRITE_SCALING, "A filthy bed... Looks like there's a key hidden beneath the blanket.", otherMessage="A filthy bed.", hasItem = 'KEY')
@@ -988,7 +1000,7 @@ class MyGame(arcade.Window):
                 password.append(switch.orientation)
             if type(self.rooms[self.current_room].password[0]) == list:
                 if password == self.rooms[self.current_room].password[0]:
-                    print('Fuck')
+
                     self.rooms[self.current_room].secret_item.hasItem = 'KEY'
                     self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
@@ -996,7 +1008,7 @@ class MyGame(arcade.Window):
                     print(self.rooms[self.current_room].password)
             else:
                 if password == self.rooms[self.current_room].password:
-                    print('Fuck')
+
                     self.rooms[self.current_room].secret_item.hasItem = 'KEY'
                     self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
