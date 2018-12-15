@@ -28,6 +28,7 @@ GAME = 0
 DIALOGUE = 1
 INVENTORY = 2
 INSTRUCTIONS = 3
+GAME_OVER = 4
 
 #Inherent traits of player
 MOVEMENT_SPEED = 5
@@ -276,11 +277,17 @@ def setup_room_1():
     #room.transparent_list.append(note1)
     room.wall_list.append(note1)
 
-    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Two hooded figures bow to a monument in the east, while the third one flees.")
+    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Two hooded figures bow to a monument in the west, while the third one flees.")
     note2.left = 5 * SPRITE_SIZE
     note2.bottom = 13 * SPRITE_SIZE
     room.object_list.append(note2)
     room.wall_list.append(note2)
+
+    note3 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, 'The note reads: V I \ \n                                 /\n Once completed, look at the maze.')
+    note3.left = 7 * SPRITE_SIZE
+    note3.bottom = 1 * SPRITE_SIZE
+    room.object_list.append(note3)
+    room.wall_list.append(note3)
     # Creating doors:
     door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
     door1.left = 14*SPRITE_SIZE
@@ -362,10 +369,17 @@ def setup_room_1():
     room.switch_list.append(switch5)
 
     #The key that comes from these switches
-    room.secret_item = crowbar = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "A key appeared.", hasItem = 'KEY', disappears= True)
-    room.secret_item.left = 11 * SPRITE_SIZE
-    room.secret_item.bottom = 14 * SPRITE_SIZE
+    room.secret_item = []
+    key1 = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "You picked up the key.", hasItem = 'KEY', disappears= True)
+    key1.left = 11 * SPRITE_SIZE
+    key1.bottom = 13 * SPRITE_SIZE
+
+    key2 = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "You picked up the key.", hasItem = 'KEY', disappears= True)
+    key2.left = 26 * SPRITE_SIZE
+    key2.bottom = 2 * SPRITE_SIZE
     
+    room.secret_item.append(key1)
+    room.secret_item.append(key2)
     
 
     # Load the background image for this level.
@@ -711,7 +725,9 @@ class MyGame(arcade.Window):
     def draw_inventory(self):
         self.draw_game()
         self.player_sprite.inventory.showInventory()
-        
+
+    def draw_game_over(self):
+         arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, arcade.load_texture("Images/WinScreen.png"))   
 
     def on_draw(self):
         """Draws the things on the screen"""
@@ -731,6 +747,9 @@ class MyGame(arcade.Window):
 
         elif self.state == INSTRUCTIONS:
             self.draw_instructions()
+
+        elif self.state == GAME_OVER:
+            self.draw_game_over()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -935,7 +954,7 @@ class MyGame(arcade.Window):
         # OBJECT INTERACTIONS
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                print(self.player_sprite.inventory.item_list)
+                
                 #If the object has a key, update inventory
 
                 if items.hasItem == 'KEY' and not items.breakable:
@@ -994,6 +1013,7 @@ class MyGame(arcade.Window):
                 #Changing the state of the game
                 self.state = DIALOGUE
 
+        #Checks if the password in the room is correct
         if self.rooms[self.current_room].password != []:
             password = []
             for switch in self.rooms[self.current_room].switch_list:
@@ -1001,19 +1021,22 @@ class MyGame(arcade.Window):
             if type(self.rooms[self.current_room].password[0]) == list:
                 if password == self.rooms[self.current_room].password[0]:
 
-                    self.rooms[self.current_room].secret_item.hasItem = 'KEY'
-                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
-                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                    #self.rooms[self.current_room].secret_item.hasItem = 'KEY'
+                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item[0])
+                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item[0])
                     del self.rooms[self.current_room].password[0]
-                    print(self.rooms[self.current_room].password)
+                    del self.rooms[self.current_room].secret_item[0]
             else:
                 if password == self.rooms[self.current_room].password:
 
-                    self.rooms[self.current_room].secret_item.hasItem = 'KEY'
-                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
-                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                    #self.rooms[self.current_room].secret_item.hasItem = 'KEY'
+                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item[0])
+                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item[0])
                     self.rooms[self.current_room].password = []
 
+        #Checks if you finished the game
+        if self.current_room == 1:
+            self.state = GAME_OVER
         
 
         
