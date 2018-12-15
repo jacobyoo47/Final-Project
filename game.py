@@ -68,6 +68,7 @@ class Room:
         self.portal_list = None
         self.object_list = None
         self.door_list = None
+        self.transparent_list = arcade.SpriteList()
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
@@ -80,7 +81,7 @@ class Inventory:
         self.screen_width = screen_width
         self.inv_height = inv_height
         self.center_height = center_height
-        self.item_list = []
+        self.item_list = ['KEY'] #starts with key for now for debugging
 
     def storeSprites(self):
         """Stores each item in the player's inventory as a sprite in item_sprites"""
@@ -143,6 +144,40 @@ def setup_room_1():
             wall.bottom = y
             room.wall_list.append(wall)
 
+    # Create walls of holding cell
+    for x in range(0, 6 * SPRITE_SIZE, SPRITE_SIZE):
+        wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+        wall.left = x
+        wall.bottom = 6 * SPRITE_SIZE
+        room.wall_list.append(wall)
+    for y in range(0, 5 * SPRITE_SIZE, SPRITE_SIZE):
+        if (y != SPRITE_SIZE * 3):
+            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+            wall.left = 5 * SPRITE_SIZE
+            wall.bottom = y
+            room.wall_list.append(wall)        
+
+    # Create walls of first room
+    for x in range(0, 11 * SPRITE_SIZE, SPRITE_SIZE):
+        wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+        wall.left = x
+        wall.bottom = 8 * SPRITE_SIZE
+        room.wall_list.append(wall)
+    for y in range(0, 8 * SPRITE_SIZE, SPRITE_SIZE):
+        if (y != SPRITE_SIZE * 3):
+            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+            wall.left = 10 * SPRITE_SIZE
+            wall.bottom = y
+            room.wall_list.append(wall)   
+
+    # Create middle dividing wall
+    for y in range(0, SCREEN_HEIGHT, SPRITE_SIZE):
+        if (y != SPRITE_SIZE * 5):
+            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+            wall.left = 14 * SPRITE_SIZE
+            wall.bottom = y
+            room.wall_list.append(wall)         
+
     # Create left and right column of boxes
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
         # Loop for each box going across
@@ -166,27 +201,56 @@ def setup_room_1():
     portal.bottom = 6 * SPRITE_SIZE
     room.portal_list.append(portal)
 
-    #Adding interactable objects
+    # Adding interactable objects
     box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", key = True)
     box.left = 2 * SPRITE_SIZE
     box.bottom = 13 * SPRITE_SIZE
-    #Adding this object to the wall_list so that it can be drawn and have collision
+    # Adding this object to the wall_list so that it can be drawn and have collision
     room.wall_list.append(box)
     room.object_list.append(box)
 
-    #Same as the above
+    # Same as the above
     box2 = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "Another daft box. ")
     box2.left = 4 * SPRITE_SIZE
     box2.bottom = 13 * SPRITE_SIZE
     room.wall_list.append(box2)
     room.object_list.append(box2)
 
-    door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True)
-    door1.left = 15*SPRITE_SIZE
+    # Creating starting note
+    note1 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Sometimes, backtracking is necessary.")
+    note1.left = 4 * SPRITE_SIZE
+    note1.bottom = 2 * SPRITE_SIZE
+    room.object_list.append(note1)
+    room.transparent_list.append(note1)
+
+    # Creating doors:
+    door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
+    door1.left = 14*SPRITE_SIZE
     door1.bottom = 5*SPRITE_SIZE
     room.wall_list.append(door1)
     room.door_list.append(door1)
     room.object_list.append(door1)
+
+    door2 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
+    door2.left = 5*SPRITE_SIZE
+    door2.bottom = 3*SPRITE_SIZE
+    room.wall_list.append(door2)
+    room.door_list.append(door2)
+    room.object_list.append(door2)
+
+    door3 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
+    door3.left = 10*SPRITE_SIZE
+    door3.bottom = 3*SPRITE_SIZE
+    room.wall_list.append(door3)
+    room.door_list.append(door3)
+    room.object_list.append(door3)
+
+    #door4 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, 'Opened the door.', door = True)
+    #door4.left = 5*SPRITE_SIZE
+    #door4.bottom = 7*SPRITE_SIZE
+    #room.wall_list.append(door4)
+    #room.door_list.append(door4)
+    #room.object_list.append(door4)
 
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
@@ -233,6 +297,8 @@ def setup_room_2():
     wall.left = 5 * SPRITE_SIZE
     wall.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(wall)
+
+
 
     #Setting the background of the room
     room.background = arcade.load_texture("Images/floor1.jpg")
@@ -453,8 +519,13 @@ class MyGame(arcade.Window):
         # above for each list.
         self.rooms[self.current_room].portal_list.draw()
 
+        #Draw the note sprite
+        self.rooms[self.current_room].transparent_list.draw()
+
         #Draws all player sprites
         self.player_list.draw()
+
+
 
         self.rooms[self.current_room].door_list.draw()
 
@@ -544,7 +615,7 @@ class MyGame(arcade.Window):
                 self.player_sprite.useObject = False
                 self.state = GAME
                 
-
+        #Press X or C to exit inventory
         elif self.state == INVENTORY:
             if key == arcade.key.C or key == arcade.key.X:
                 self.state = GAME
@@ -676,19 +747,25 @@ class MyGame(arcade.Window):
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                #If the object has an item, update inventory
+                #If the object has a key, update inventory
                 if items.key:
                     items.key = False
                     self.player_sprite.inventory.item_list.append('KEY')
                 
                 #Opening doors with a key
-                if items.lock and len(self.player_sprite.inventory.item_list) > 0:
+                if items.lock and 'KEY' in (self.player_sprite.inventory.item_list):
                     items.message = "Used the key."
                     items.unlock()
                     items.lock = False
                     self.rooms[self.current_room].wall_list.remove(items)
                     self.rooms[self.current_room].object_list.remove(items)
                     self.player_sprite.inventory.useItem()
+
+                #Opening unlocked doors
+                #if items.lock == False and items.door == True:
+                #    items.unlock()
+                #    self.rooms[self.current_room].wall_list.remove(items)
+                #    self.rooms[self.current_room].object_list.remove(items)
                     
                 #Ensuring there is no movement after interacting with an object
                 self.player_sprite.change_x = 0
