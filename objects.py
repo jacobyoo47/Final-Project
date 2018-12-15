@@ -68,7 +68,7 @@ class Switch(arcade.Sprite):
         elif self.orientation == 'NEUTRAL':
             self.texture = arcade.load_texture("Images/lever_right.png", scale = self.scaling)
             self.orientation = 'RIGHT'
-        else:
+        elif self.orientation == 'RIGHT':
             self.texture = arcade.load_texture("Images/lever_left.png", scale = self.scaling)
             self.orientation = 'LEFT'
 
