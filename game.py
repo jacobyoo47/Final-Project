@@ -49,6 +49,7 @@ class Player(arcade.Sprite):
 
         #Interacting Variables
         self.useObject = False
+        self.canUsePortal = True
     
     def update_animation(self):
         """Adding images that show which direction the character is facing"""
@@ -117,6 +118,13 @@ class Portal(arcade.Sprite):
     This class represents the portals on our screen. It is a child class of
     the arcade library's "Sprite" class.
     """
+    
+    def __init__(self):
+        super().__init__("Images/gold_portal.png", SPRITE_SCALING)
+        self.start_x = 0
+        self.start_y = 0
+        self.end_x = 0
+        self.end_y = 0
 
 def setup_room_1():
     """
@@ -142,15 +150,16 @@ def setup_room_1():
             room.transparent_list.append(floor)
 
     # -- Set up the walls
-    # Create bottom and top row of boxes
+    # Create bottom and top row of walls
     # This y loops a list of two, the coordinate 0, and just under the top of window
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
-            wall.left = x
-            wall.bottom = y
-            room.wall_list.append(wall)
+            if (x != SCREEN_WIDTH - 6 * SPRITE_SIZE) or (y != SCREEN_HEIGHT - SPRITE_SIZE):
+                wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+                wall.left = x
+                wall.bottom = y
+                room.wall_list.append(wall)
 
     # Create walls of holding cell
     for x in range(0, 6 * SPRITE_SIZE, SPRITE_SIZE):
@@ -186,28 +195,39 @@ def setup_room_1():
             wall.bottom = y
             room.wall_list.append(wall)         
 
-    # Create left and right column of boxes
+    # Create left and right column of walls
     for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
-        # Loop for each box going across
+        # Loop for each wall going across
         for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-            # Skip making a block 4 and 5 blocks up on the right side
-            if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x == 0:
-                wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
-                wall.left = x
-                wall.bottom = y
-                room.wall_list.append(wall)
+            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+            wall.left = x
+            wall.bottom = y
+            room.wall_list.append(wall)
 
-    wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
-    wall.left = 5 * SPRITE_SIZE
-    wall.bottom = 5 * SPRITE_SIZE
-    room.wall_list.append(wall)
+    # Create maze walls
+    xList = [1,2,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,8,8,8,8,9,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10,11,11,11,11,11,12,12,12,12,12,12,12,12,13,13,13,13,13,13,14,14]
+    yList = [12,1,4,6,7,8,9,10,3,4,8,11,12,1,2,3,5,6,8,10,12,13,3,8,9,13,14,4,5,6,7,8,12,13,2,3,4,5,8,9,10,12,2,5,6,11,2,5,8,9,10,11,14,2,3,5,6,8,9,10,12,13,1,4,6,10,13,1,3,4,6,7,8,9,11,2,6,8,11,13,14,4,10]
+    for i in range(len(xList)):
+        wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+        wall.left = (xList[i] + 14) * SPRITE_SIZE
+        wall.bottom = yList[i] * SPRITE_SIZE
+        room.wall_list.append(wall)
 
     # If you want coins or monsters in a level, then add that code here.
-    # Make a portal
-    portal = Portal("Images/gold_portal.png", SPRITE_SCALING)
-    portal.left = 5 * SPRITE_SIZE
-    portal.bottom = 6 * SPRITE_SIZE
-    room.portal_list.append(portal)
+    # Make portals
+    start_xList = [3,3,4,4,4,6,6,7,8,8,9,9,10,11,11,11,12,13,13,14]
+    start_yList = [1,10,4,11,14,3,9,1,3,10,7,12,4,3,5,9,10,3,7,14]
+    end_xList = [6,11,6,9,8,4,3,9,4,10,4,7,6,12,3,13,11,11,14,13]
+    end_yList = [9,5,3,7,3,4,1,12,14,4,11,1,10,10,10,3,3,9,14,7]
+    for i in range(len(start_xList)):
+        portal = Portal()
+        portal.start_x = (start_xList[i] + 14) * SPRITE_SIZE
+        portal.start_y = start_yList[i] * SPRITE_SIZE
+        portal.end_x = (end_xList[i] + 14) * SPRITE_SIZE
+        portal.end_y = end_yList[i] * SPRITE_SIZE
+        portal.left = portal.start_x
+        portal.bottom = portal.start_y
+        room.portal_list.append(portal)
 
     # Adding interactable objects
     box = objects.InteractObjects("Images/Sign.png", SPRITE_SCALING, "A boring, brown, container... Oh, never mind. It has a key.", otherMessage = "Yup, just a boring, brown, container...", key = True)
@@ -301,21 +321,20 @@ def setup_room_2():
     for y in (0, SCREEN_HEIGHT - SPRITE_SIZE):
         # Loop for each box going across
         for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
-            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
-            wall.left = x
-            wall.bottom = y
-            room.wall_list.append(wall)
-
-    # Create left and right column of boxes
-    for x in (0, SCREEN_WIDTH -  SPRITE_SIZE):
-        # Loop for each box going across
-        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
-            # Skip making a block 4 and 5 blocks up
-            if (y != SPRITE_SIZE * 4 and y != SPRITE_SIZE * 5) or x != 0:
+            if x != SCREEN_WIDTH - 6 * SPRITE_SIZE or y != 0:
                 wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
                 wall.left = x
                 wall.bottom = y
                 room.wall_list.append(wall)
+
+    # Create left and right column of boxes
+    for x in (0, SCREEN_WIDTH - SPRITE_SIZE):
+        # Loop for each box going across
+        for y in range(SPRITE_SIZE, SCREEN_HEIGHT - SPRITE_SIZE, SPRITE_SIZE):
+            wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
+            wall.left = x
+            wall.bottom = y
+            room.wall_list.append(wall)
 
     wall = arcade.Sprite("Images/RogueSprites/block1.png", SPRITE_SCALING)
     wall.left = 5 * SPRITE_SIZE
@@ -495,7 +514,7 @@ class MyGame(arcade.Window):
         # Our button list
         self.button_list = []
         
-        start_button = StartTextButton(60, 570, self.start_game)
+        start_button = StartTextButton(600, 75, self.start_game)
         self.button_list.append(start_button)
 
         # Our list of rooms
@@ -526,6 +545,23 @@ class MyGame(arcade.Window):
         """
         for button in self.button_list:
             button.draw()
+
+        arcade.draw_text("INSTRUCTIONS", SCREEN_WIDTH // 2, 550,
+                         arcade.color.WHITE, font_size=40,
+                         width=1000, align="center",
+                         anchor_x="center", anchor_y="center")
+        arcade.draw_text("Use the arrow keys to move", SCREEN_WIDTH // 2, 500,
+                         arcade.color.WHITE, font_size=20,
+                         width=1000, align="center",
+                         anchor_x="center", anchor_y="center")
+        arcade.draw_text("Use \"Z\" to interact with objects", SCREEN_WIDTH // 2, 450,
+                         arcade.color.WHITE, font_size=20,
+                         width=1000, align="center",
+                         anchor_x="center", anchor_y="center")
+        arcade.draw_text("Use \"C\" to show the inventory", SCREEN_WIDTH // 2, 400,
+                         arcade.color.WHITE, font_size=20,
+                         width=1000, align="center",
+                         anchor_x="center", anchor_y="center")
 
     def draw_game(self):
         """
@@ -705,6 +741,7 @@ class MyGame(arcade.Window):
             ## PLAYER INTERACTIONS
             elif key == arcade.key.Z:
                 self.player_sprite.useObject = False
+                self.player_sprite.canUsePortal = True
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         """
@@ -754,21 +791,25 @@ class MyGame(arcade.Window):
 
         # Do some logic here to figure out what room we are in, and if we need to go
         # to a different room.
-        if self.player_sprite.center_x > SCREEN_WIDTH and self.current_room == 0:
+        if self.player_sprite.center_y > SCREEN_HEIGHT and self.current_room == 0:
             self.current_room = 1
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = 0
-        elif self.player_sprite.center_x < 0 and self.current_room == 1:
+            self.player_sprite.center_y = 0
+        elif self.player_sprite.center_y < 0 and self.current_room == 1:
             self.current_room = 0
             self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite,
                                                              self.rooms[self.current_room].wall_list)
-            self.player_sprite.center_x = SCREEN_WIDTH
+            self.player_sprite.center_y = SCREEN_HEIGHT
 
         #PORTAL INTERACTION
-        elif self.current_room == 0 and len(hit_list) > 0 and self.player_sprite.useObject == True: # len(hit_list) > 0 should be changed later on to be more specific
-            self.current_room = 1
-            self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+        elif len(hit_list) > 0 and self.player_sprite.useObject == True:
+            if self.player_sprite.canUsePortal == True:
+                p = hit_list[0]
+                self.player_sprite.left = p.end_x
+                self.player_sprite.bottom = p.end_y
+                self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
+                self.player_sprite.canUsePortal = False
 
         #Object Interaction
         for items in self.rooms[self.current_room].object_list:
