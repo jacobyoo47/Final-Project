@@ -982,7 +982,7 @@ class MyGame(arcade.Window):
                 password.append(switch.orientation)
             if type(self.rooms[self.current_room].password[0]) == list:
                 if password == self.rooms[self.current_room].password[0]:
-                    print('Fuck')
+                    print('Password is correct!')
                     self.rooms[self.current_room].secret_item.hasItem = 'KEY'
                     self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
@@ -990,7 +990,7 @@ class MyGame(arcade.Window):
                     print(self.rooms[self.current_room].password)
             else:
                 if password == self.rooms[self.current_room].password:
-                    print('Fuck')
+                    print('Password is correct!')
                     self.rooms[self.current_room].secret_item.hasItem = 'KEY'
                     self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
