@@ -155,7 +155,7 @@ def setup_room_1():
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
-    room.password = ['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'LEFT']
+    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'LEFT'], ['LEFT', 'RIGHT', 'NEUTRAL', 'LEFT', 'RIGHT']]
 
     
     # Draw background
@@ -982,15 +982,25 @@ class MyGame(arcade.Window):
                 #Changing the state of the game
                 self.state = DIALOGUE
 
-        if len(self.rooms[self.current_room].password) > 1:
+        if self.rooms[self.current_room].password != []:
             password = []
             for switch in self.rooms[self.current_room].switch_list:
                 password.append(switch.orientation)
-            if password == self.rooms[self.current_room].password:
-                print('Fuck')
-                self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
-                self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
-                self.rooms[self.current_room].password = []
+            if type(self.rooms[self.current_room].password[0]) == list:
+                if password == self.rooms[self.current_room].password[0]:
+                    print('Fuck')
+                    self.rooms[self.current_room].secret_item.hasItem = 'KEY'
+                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
+                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                    del self.rooms[self.current_room].password[0]
+                    print(self.rooms[self.current_room].password)
+            else:
+                if password == self.rooms[self.current_room].password:
+                    print('Fuck')
+                    self.rooms[self.current_room].secret_item.hasItem = 'KEY'
+                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
+                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                    self.rooms[self.current_room].password = []
 
         
 
