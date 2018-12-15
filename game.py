@@ -71,6 +71,9 @@ class Room:
         self.door_list = None
         self.transparent_list = arcade.SpriteList()
         self.switch_list = arcade.SpriteList()
+        self.password = []
+        self.secret_item = None
+        
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
@@ -145,7 +148,9 @@ def setup_room_1():
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
+    room.password = ['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'LEFT']
 
+    
     # Draw background
     for x in range(0, SCREEN_WIDTH, SPRITE_SIZE):
         for y in range(0, SCREEN_HEIGHT, SPRITE_SIZE):
@@ -299,14 +304,45 @@ def setup_room_1():
     room.wall_list.append(crowbar)
     room.object_list.append(crowbar)
 
+
     #Switches
     switch1 = objects.Switch(SPRITE_SCALING)
-    switch1.left = 3 * SPRITE_SIZE
+    switch1.left = 2 * SPRITE_SIZE
     switch1.bottom = 11 * SPRITE_SIZE
     room.wall_list.append(switch1)
     room.switch_list.append(switch1)
 
+    switch2 = objects.Switch(SPRITE_SCALING)
+    switch2.left = 4 * SPRITE_SIZE
+    switch2.bottom = 11 * SPRITE_SIZE
+    room.wall_list.append(switch2)
+    room.switch_list.append(switch2)
+
+    switch3 = objects.Switch(SPRITE_SCALING)
+    switch3.left = 6 * SPRITE_SIZE
+    switch3.bottom = 11 * SPRITE_SIZE
+    room.wall_list.append(switch3)
+    room.switch_list.append(switch3)
+
+    switch4 = objects.Switch(SPRITE_SCALING)
+    switch4.left = 8 * SPRITE_SIZE
+    switch4.bottom = 11 * SPRITE_SIZE
+    room.wall_list.append(switch4)
+    room.switch_list.append(switch4)
+
+    switch5 = objects.Switch(SPRITE_SCALING)
+    switch5.left = 6 * SPRITE_SIZE
+    switch5.bottom = 1 * SPRITE_SIZE
+    room.wall_list.append(switch5)
+    room.switch_list.append(switch5)
+
+    #The key that comes from these switches
+    room.secret_item = crowbar = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "A key appeared.", key = True, disappears= True)
+    room.secret_item.left = 11 * SPRITE_SIZE
+    room.secret_item.bottom = 14 * SPRITE_SIZE
     
+    
+
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
 
@@ -666,6 +702,9 @@ class MyGame(arcade.Window):
             ## PLAYER INTERACTIONS:
             elif key == arcade.key.Z:
                 self.player_sprite.useObject = True
+                for switch in self.rooms[self.current_room].switch_list:
+                    if switch.isColliding(self.player_sprite) and self.player_sprite.useObject:
+                        switch.toggleSwitch()
             
             elif key == arcade.key.C:
                 #Ensuring there is no movement after opening the inventory
@@ -831,6 +870,9 @@ class MyGame(arcade.Window):
                 #If the object has a key, update inventory
                 if items.key and not items.breakable:
                     items.key = False
+                    if items.disappears:
+                        self.rooms[self.current_room].wall_list.remove(items)
+                        self.rooms[self.current_room].object_list.remove(items)
                     self.player_sprite.inventory.item_list.append('KEY')
 
                 #If the object has a crowbar, update inventory
@@ -882,7 +924,16 @@ class MyGame(arcade.Window):
                 #Changing the state of the game
                 self.state = DIALOGUE
 
-        ####
+        if len(self.rooms[self.current_room].password) > 1:
+            password = []
+            for switch in self.rooms[self.current_room].switch_list:
+                password.append(switch.orientation)
+            if password == self.rooms[self.current_room].password:
+                print('Fuck')
+                self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
+                self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                self.rooms[self.current_room].password = []
+
         
 
         
