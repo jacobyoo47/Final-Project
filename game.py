@@ -87,7 +87,7 @@ class Inventory:
         self.screen_width = screen_width
         self.inv_height = inv_height
         self.center_height = center_height
-        self.item_list = [] #starts with key for now for debugging
+        self.item_list = ['BROKEN_LEVER'] #starts with key for now for debugging
 
     def storeSprites(self):
         """Stores each item in the player's inventory as a sprite in item_sprites"""
@@ -110,6 +110,8 @@ class Inventory:
                 lever = arcade.Sprite('Images/lever_handle.png', SPRITE_SCALING)
                 lever.left = item_locations[location]
                 lever.bottom = self.center_height - 20
+                location += 1
+                self.item_sprites.append(lever)
     
     def useItem(self, item):
         """Uses up an item and removes from inventory"""
@@ -341,7 +343,7 @@ def setup_room_1():
     room.wall_list.append(switch4)
     room.switch_list.append(switch4)
 
-    switch5 = objects.Switch(SPRITE_SCALING)
+    switch5 = objects.Switch(SPRITE_SCALING, orientation = 'BROKEN')
     switch5.left = 6 * SPRITE_SIZE
     switch5.bottom = 1 * SPRITE_SIZE
     room.wall_list.append(switch5)
@@ -748,8 +750,12 @@ class MyGame(arcade.Window):
             elif key == arcade.key.Z:
                 self.player_sprite.useObject = True
                 for switch in self.rooms[self.current_room].switch_list:
-                    if switch.isColliding(self.player_sprite) and self.player_sprite.useObject:
+                    if switch.isColliding(self.player_sprite) and self.player_sprite.useObject and switch.orientation != 'BROKEN':
                         switch.toggleSwitch()
+                    elif switch.isColliding(self.player_sprite) and self.player_sprite.useObject and switch.orientation == 'BROKEN' and 'BROKEN_LEVER' in self.player_sprite.inventory.item_list:
+                        switch.orientation = 'LEFT'
+                        switch.texture = arcade.load_texture("Images/lever_left.png", scale = switch.scaling)
+                        self.player_sprite.inventory.useItem('BROKEN_LEVER')
             
             elif key == arcade.key.C:
                 #Ensuring there is no movement after opening the inventory
@@ -934,7 +940,13 @@ class MyGame(arcade.Window):
                     self.rooms[self.current_room].object_list.remove(items)
                     self.player_sprite.inventory.item_list.append('CROWBAR')
 
-                
+                #If the object has a broken lever, update inventory
+                if items.hasItem == 'BROKEN_LEVER' and not items.breakable:
+                    items.hasItem = None
+                    self.rooms[self.current_room].wall_list.remove(items)
+                    self.rooms[self.current_room].object_list.remove(items)
+                    self.player_sprite.inventory.item_list.append('BROKEN_LEVER')
+
                 #Opening doors with a key
                 if items.lock and 'KEY' in (self.player_sprite.inventory.item_list):
                     items.message = "Used the key."
@@ -957,12 +969,6 @@ class MyGame(arcade.Window):
                     self.player_sprite.inventory.useItem('CROWBAR')
                     self.player_sprite.inventory.item_list.append('KEY')
 
-                #Opening unlocked doors
-                #if items.lock == False and items.door == True:
-                #    items.unlock()
-                #    self.rooms[self.current_room].wall_list.remove(items)
-                #    self.rooms[self.current_room].object_list.remove(items)
-                    
                 #Ensuring there is no movement after interacting with an object
                 self.player_sprite.change_x = 0
                 self.player_sprite.change_y = 0
