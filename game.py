@@ -87,7 +87,7 @@ class Inventory:
         self.screen_width = screen_width
         self.inv_height = inv_height
         self.center_height = center_height
-        self.item_list = ['BROKEN_LEVER'] #starts with key for now for debugging
+        self.item_list = [] #starts with key for now for debugging
 
     def storeSprites(self):
         """Stores each item in the player's inventory as a sprite in item_sprites"""
@@ -155,7 +155,7 @@ def setup_room_1():
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
-    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'LEFT'], ['LEFT', 'RIGHT', 'NEUTRAL', 'LEFT', 'RIGHT']]
+    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['LEFT', 'RIGHT', 'NEUTRAL', 'LEFT', 'RIGHT']]
 
     
     # Draw background
@@ -297,6 +297,13 @@ def setup_room_1():
     room.wall_list.append(door3)
     room.door_list.append(door3)
     room.object_list.append(door3)
+
+    doorfinal = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
+    doorfinal.left = 24*SPRITE_SIZE
+    doorfinal.bottom = 15*SPRITE_SIZE
+    room.wall_list.append(doorfinal)
+    room.door_list.append(doorfinal)
+    room.object_list.append(doorfinal)
 
     # Furniture/Items
     bed = objects.InteractObjects("Images/bed.png", SPRITE_SCALING, "A filthy bed... Looks like there's a key hidden beneath the blanket.", otherMessage="A filthy bed.", hasItem = 'KEY')
