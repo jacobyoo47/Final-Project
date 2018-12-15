@@ -70,6 +70,7 @@ class Room:
         self.object_list = None
         self.door_list = None
         self.transparent_list = arcade.SpriteList()
+        self.switch_list = arcade.SpriteList()
         # This holds the background images. If you don't want changing
         # background images, you can delete this part.
         self.background = None
@@ -82,11 +83,11 @@ class Inventory:
         self.screen_width = screen_width
         self.inv_height = inv_height
         self.center_height = center_height
-        self.item_list = ['KEY'] #starts with key for now for debugging
+        self.item_list = [] #starts with key for now for debugging
 
     def storeSprites(self):
         """Stores each item in the player's inventory as a sprite in item_sprites"""
-        item_locations = [150, 200, 250]
+        item_locations = [150, 200, 250, 300, 350, 400, 450]
         location = 0
         for item in self.item_list:
             if item == 'KEY':
@@ -95,12 +96,16 @@ class Inventory:
                 key.bottom = self.center_height - 20
                 location += 1
                 self.item_sprites.append(key)
-            else:
-                continue
+            elif item == 'CROWBAR':
+                crowbar = arcade.Sprite('Images/crowbar.png', SPRITE_SCALING)
+                crowbar.left = item_locations[location]
+                crowbar.bottom = self.center_height - 20
+                location += 1
+                self.item_sprites.append(crowbar)
     
-    def useItem(self):
+    def useItem(self, item):
         """Uses up an item and removes from inventory"""
-        self.item_list.pop()
+        self.item_list.remove(item)
         self.item_sprites = arcade.SpriteList()
         self.storeSprites()
 
@@ -245,7 +250,7 @@ def setup_room_1():
     room.object_list.append(box2)
 
     # Crates
-    crate1 = objects.InteractObjects("Images/barrel.png", SPRITE_SCALING, "A sturdy wooden crate. ")
+    crate1 = objects.InteractObjects("Images/barrel.png", SPRITE_SCALING, "A moldy wooden crate. ", breakable=True, key=True)
     crate1.left = 3 * SPRITE_SIZE
     crate1.bottom = 5 * SPRITE_SIZE
     room.wall_list.append(crate1)
@@ -281,21 +286,27 @@ def setup_room_1():
     room.door_list.append(door3)
     room.object_list.append(door3)
 
-    # Furniture
+    # Furniture/Items
     bed = objects.InteractObjects("Images/bed.png", SPRITE_SCALING, "A filthy bed... Looks like there's a key hidden beneath the blanket.", otherMessage="A filthy bed.", key = True)
     bed.left = 1 * SPRITE_SIZE
     bed.bottom = 1 * SPRITE_SIZE
     room.wall_list.append(bed)
     room.object_list.append(bed)
 
+    crowbar = objects.InteractObjects("Images/crowbar.png", SPRITE_SCALING, "A brittle, rusty crowbar.", crowbar = True)
+    crowbar.left = 2 * SPRITE_SIZE
+    crowbar.bottom = 7 * SPRITE_SIZE
+    room.wall_list.append(crowbar)
+    room.object_list.append(crowbar)
 
-    #door4 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, 'Opened the door.', door = True)
-    #door4.left = 5*SPRITE_SIZE
-    #door4.bottom = 7*SPRITE_SIZE
-    #room.wall_list.append(door4)
-    #room.door_list.append(door4)
-    #room.object_list.append(door4)
+    #Switches
+    switch1 = objects.Switch(SPRITE_SCALING)
+    switch1.left = 3 * SPRITE_SIZE
+    switch1.bottom = 11 * SPRITE_SIZE
+    room.wall_list.append(switch1)
+    room.switch_list.append(switch1)
 
+    
     # Load the background image for this level.
     room.background = arcade.load_texture("Images/floor1.jpg")
 
@@ -497,6 +508,7 @@ class MyGame(arcade.Window):
         self.physics_engine = None
         self.useObject = None
         self.total_time = 0.0
+        self.onCrate = False
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -670,10 +682,11 @@ class MyGame(arcade.Window):
         elif self.state == DIALOGUE:
             if key == arcade.key.Z:
                 #Changing the dialouge if the object has another message
-                if self.current_message.otherMessage != None:
+                if self.current_message.otherMessage != None and self.onCrate == False:
                     self.current_message.changeMessage()
-    
-
+                elif self.current_message.otherMessage == None and self.onCrate == True:
+                    self.current_message.message = 'A pile of wooden scraps.'
+                self.onCrate = False
                 self.player_sprite.useObject = False
                 self.state = GAME
                 
@@ -811,13 +824,22 @@ class MyGame(arcade.Window):
                 self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.rooms[self.current_room].wall_list)
                 self.player_sprite.canUsePortal = False
 
-        #Object Interaction
+        # OBJECT INTERACTIONS
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
+                print(self.player_sprite.inventory.item_list)
                 #If the object has a key, update inventory
-                if items.key:
+                if items.key and not items.breakable:
                     items.key = False
                     self.player_sprite.inventory.item_list.append('KEY')
+
+                #If the object has a crowbar, update inventory
+                if items.crowbar and not items.breakable:
+                    items.crowbar = False
+                    self.rooms[self.current_room].wall_list.remove(items)
+                    self.rooms[self.current_room].object_list.remove(items)
+                    self.player_sprite.inventory.item_list.append('CROWBAR')
+
                 
                 #Opening doors with a key
                 if items.lock and 'KEY' in (self.player_sprite.inventory.item_list):
@@ -826,7 +848,20 @@ class MyGame(arcade.Window):
                     items.lock = False
                     self.rooms[self.current_room].wall_list.remove(items)
                     self.rooms[self.current_room].object_list.remove(items)
-                    self.player_sprite.inventory.useItem()
+                    self.player_sprite.inventory.useItem('KEY')
+
+                #Breaking crates with a crowbar
+                if items.breakable and 'CROWBAR' in (self.player_sprite.inventory.item_list) and items.key:
+                    items.message = "Smashed the crate with the crowbar, Gordon Freeman style. There was a key inside."
+                    items.broken()
+                    items.key = False
+                    items.breakable = False
+                    self.onCrate = True
+                    self.rooms[self.current_room].wall_list.remove(items)
+                    self.rooms[self.current_room].object_list.remove(items)
+                    self.rooms[self.current_room].transparent_list.append(items)
+                    self.player_sprite.inventory.useItem('CROWBAR')
+                    self.player_sprite.inventory.item_list.append('KEY')
 
                 #Opening unlocked doors
                 #if items.lock == False and items.door == True:
@@ -846,6 +881,8 @@ class MyGame(arcade.Window):
 
                 #Changing the state of the game
                 self.state = DIALOGUE
+
+        ####
         
 
         
