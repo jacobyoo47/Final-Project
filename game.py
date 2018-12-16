@@ -156,7 +156,7 @@ def setup_room_1():
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
-    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['LEFT', 'RIGHT', 'LEFT', 'RIGHT', 'NEUTRAL']]
+    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['LEFT', 'RIGHT', 'NEUTRAL', 'LEFT', 'RIGHT']]
 
     
     # Draw background
@@ -270,31 +270,24 @@ def setup_room_1():
     room.object_list.append(crate1)
 
     # Creating starting note
-    note1 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "\"Sometimes, backtracking is necessary.\"")
+    note1 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Sometimes, backtracking is necessary.")
     note1.left = 4 * SPRITE_SIZE
     note1.bottom = 1 * SPRITE_SIZE
     room.object_list.append(note1)
     #room.transparent_list.append(note1)
     room.wall_list.append(note1)
 
-    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "\"Two hooded figures bow to a monument in the west, while the third one flees.\"")
+    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Two hooded figures bow to a monument in the west, while the third one flees.")
     note2.left = 5 * SPRITE_SIZE
     note2.bottom = 13 * SPRITE_SIZE
     room.object_list.append(note2)
     room.wall_list.append(note2)
 
-    note3 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, '\"Two couples whisper to each other, while the lonely man stands tall, trying to eavesdrop.\"')
+    note3 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, 'The note reads: Chapter V-IV: How to fix a broken lever.\nThe rest of the note is illegible.')
     note3.left = 7 * SPRITE_SIZE
-    note3.bottom = 1 * SPRITE_SIZE
+    note3.bottom = 2 * SPRITE_SIZE
     room.object_list.append(note3)
     room.wall_list.append(note3)
-
-    note4 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, '\"Jason, make sure you fix the lever before waking the prisoner. There should be a spare part in the maze. -Nick\"')
-    note4.left = 9 * SPRITE_SIZE
-    note4.bottom = 6 * SPRITE_SIZE
-    room.object_list.append(note4)
-    room.wall_list.append(note4)
-
     # Creating doors:
     door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
     door1.left = 14*SPRITE_SIZE
