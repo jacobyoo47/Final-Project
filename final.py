@@ -156,7 +156,7 @@ def setup_room_1():
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
-    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['LEFT', 'RIGHT', 'LEFT', 'RIGHT', 'NEUTRAL']]
+    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['RIGHT', 'LEFT', 'RIGHT', 'LEFT', 'NEUTRAL']]
 
     
     # Draw background
