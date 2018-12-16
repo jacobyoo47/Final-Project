@@ -28,6 +28,7 @@ GAME = 0
 DIALOGUE = 1
 INVENTORY = 2
 INSTRUCTIONS = 3
+GAME_OVER = 4
 
 #Inherent traits of player
 MOVEMENT_SPEED = 5
@@ -155,7 +156,7 @@ def setup_room_1():
     room.portal_list = arcade.SpriteList()
     room.object_list = arcade.SpriteList()
     room.door_list = arcade.SpriteList()
-    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['LEFT', 'RIGHT', 'NEUTRAL', 'LEFT', 'RIGHT']]
+    room.password = [['NEUTRAL', 'LEFT', 'LEFT', 'RIGHT', 'BROKEN'], ['RIGHT', 'LEFT', 'RIGHT', 'LEFT', 'NEUTRAL']]
 
     
     # Draw background
@@ -269,18 +270,31 @@ def setup_room_1():
     room.object_list.append(crate1)
 
     # Creating starting note
-    note1 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Sometimes, backtracking is necessary.")
+    note1 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "\"Sometimes, backtracking is necessary.\"")
     note1.left = 4 * SPRITE_SIZE
     note1.bottom = 1 * SPRITE_SIZE
     room.object_list.append(note1)
     #room.transparent_list.append(note1)
     room.wall_list.append(note1)
 
-    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "The note reads: Two hooded figures bow to a monument in the east, while the third one flees.")
+    note2 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, "\"Two hooded figures bow to a monument in the west, while the third one flees.\"")
     note2.left = 5 * SPRITE_SIZE
     note2.bottom = 13 * SPRITE_SIZE
     room.object_list.append(note2)
     room.wall_list.append(note2)
+
+    note3 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, '\"Two couples whisper to each other, while the lonely man stands tall, trying to eavesdrop.\"')
+    note3.left = 7 * SPRITE_SIZE
+    note3.bottom = 1 * SPRITE_SIZE
+    room.object_list.append(note3)
+    room.wall_list.append(note3)
+
+    note4 = objects.InteractObjects("Images/note.png", SPRITE_SCALING, '\"Jason, make sure you fix the lever before waking the prisoner. There should be a spare part in the maze. -Nick\"')
+    note4.left = 9 * SPRITE_SIZE
+    note4.bottom = 6 * SPRITE_SIZE
+    room.object_list.append(note4)
+    room.wall_list.append(note4)
+
     # Creating doors:
     door1 = objects.InteractObjects("Images/LockDoor.png", SPRITE_SCALING, "A locked door. I'll need to get a key.", lock = True, door = True)
     door1.left = 14*SPRITE_SIZE
@@ -362,10 +376,17 @@ def setup_room_1():
     room.switch_list.append(switch5)
 
     #The key that comes from these switches
-    room.secret_item = crowbar = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "A key appeared.", hasItem = 'KEY', disappears= True)
-    room.secret_item.left = 11 * SPRITE_SIZE
-    room.secret_item.bottom = 14 * SPRITE_SIZE
+    room.secret_item = []
+    key1 = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "You picked up the key.", hasItem = 'KEY', disappears= True)
+    key1.left = 11 * SPRITE_SIZE
+    key1.bottom = 13 * SPRITE_SIZE
+
+    key2 = objects.InteractObjects("Images/key.png", SPRITE_SCALING, "You picked up the key.", hasItem = 'KEY', disappears= True)
+    key2.left = 26 * SPRITE_SIZE
+    key2.bottom = 2 * SPRITE_SIZE
     
+    room.secret_item.append(key1)
+    room.secret_item.append(key2)
     
 
     # Load the background image for this level.
@@ -646,22 +667,36 @@ class MyGame(arcade.Window):
         # background
         arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, arcade.load_texture("Images/tutorial.jpg"))
 
-        arcade.draw_text("INSTRUCTIONS", SCREEN_WIDTH // 2, 550,
+        arcade.draw_text("PREMISE:", SCREEN_WIDTH // 2, 550,
+                        arcade.color.WHITE, font_size=40,
+                        width=1000, align="center",
+                        anchor_x="center", anchor_y="center")
+        arcade.draw_text("You play Bill, a confused Mudd student who wakes up in a dungeon.", SCREEN_WIDTH // 2, 500,
+                        arcade.color.WHITE, font_size=20,
+                        width=1000, align="center",
+                        anchor_x="center", anchor_y="center")
+        arcade.draw_text("Can you solve all the puzzles and escape?", SCREEN_WIDTH // 2, 450,
+                        arcade.color.WHITE, font_size=20,
+                        width=1000, align="center",
+                        anchor_x="center", anchor_y="center")
+
+        arcade.draw_text("INSTRUCTIONS", SCREEN_WIDTH // 2, 400,
                          arcade.color.WHITE, font_size=40,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Use the arrow keys to move", SCREEN_WIDTH // 2, 500,
+        arcade.draw_text("Use the arrow keys to move", SCREEN_WIDTH // 2, 350,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Press \"Z\" to interact with objects while facing them", SCREEN_WIDTH // 2, 450,
+        arcade.draw_text("Press \"Z\" to interact with objects while facing them", SCREEN_WIDTH // 2, 300,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Press \"C\" to show the inventory", SCREEN_WIDTH // 2, 400,
+        arcade.draw_text("Press \"C\" to show the inventory", SCREEN_WIDTH // 2, 250,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
+
 
         for button in self.button_list_howTo:
             button.draw()
@@ -711,7 +746,9 @@ class MyGame(arcade.Window):
     def draw_inventory(self):
         self.draw_game()
         self.player_sprite.inventory.showInventory()
-        
+
+    def draw_game_over(self):
+         arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, arcade.load_texture("Images/WinScreen.png"))   
 
     def on_draw(self):
         """Draws the things on the screen"""
@@ -731,6 +768,9 @@ class MyGame(arcade.Window):
 
         elif self.state == INSTRUCTIONS:
             self.draw_instructions()
+
+        elif self.state == GAME_OVER:
+            self.draw_game_over()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -935,7 +975,7 @@ class MyGame(arcade.Window):
         # OBJECT INTERACTIONS
         for items in self.rooms[self.current_room].object_list:
             if items.isColliding(self.player_sprite) and self.player_sprite.useObject:
-                print(self.player_sprite.inventory.item_list)
+                
                 #If the object has a key, update inventory
 
                 if items.hasItem == 'KEY' and not items.breakable:
@@ -994,6 +1034,7 @@ class MyGame(arcade.Window):
                 #Changing the state of the game
                 self.state = DIALOGUE
 
+        #Checks if the password in the room is correct
         if self.rooms[self.current_room].password != []:
             password = []
             for switch in self.rooms[self.current_room].switch_list:
@@ -1001,19 +1042,22 @@ class MyGame(arcade.Window):
             if type(self.rooms[self.current_room].password[0]) == list:
                 if password == self.rooms[self.current_room].password[0]:
 
-                    self.rooms[self.current_room].secret_item.hasItem = 'KEY'
-                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
-                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                    #self.rooms[self.current_room].secret_item.hasItem = 'KEY'
+                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item[0])
+                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item[0])
                     del self.rooms[self.current_room].password[0]
-                    print(self.rooms[self.current_room].password)
+                    del self.rooms[self.current_room].secret_item[0]
             else:
                 if password == self.rooms[self.current_room].password:
 
-                    self.rooms[self.current_room].secret_item.hasItem = 'KEY'
-                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item)
-                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item)
+                    #self.rooms[self.current_room].secret_item.hasItem = 'KEY'
+                    self.rooms[self.current_room].wall_list.append(self.rooms[self.current_room].secret_item[0])
+                    self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item[0])
                     self.rooms[self.current_room].password = []
 
+        #Checks if you finished the game
+        if self.current_room == 1:
+            self.state = GAME_OVER
         
 
         
