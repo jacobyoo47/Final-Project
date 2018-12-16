@@ -136,7 +136,7 @@ class Portal(arcade.Sprite):
     """
     
     def __init__(self):
-        super().__init__("Images/gold_portal.png", SPRITE_SCALING)
+        super().__init__("Images/blue_portal.png", SPRITE_SCALING)
         self.start_x = 0
         self.start_y = 0
         self.end_x = 0
