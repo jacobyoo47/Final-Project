@@ -660,22 +660,36 @@ class MyGame(arcade.Window):
         # background
         arcade.draw_texture_rectangle(SCREEN_WIDTH//2, SCREEN_HEIGHT//2, SCREEN_WIDTH, SCREEN_HEIGHT, arcade.load_texture("Images/tutorial.jpg"))
 
-        arcade.draw_text("INSTRUCTIONS", SCREEN_WIDTH // 2, 550,
+        arcade.draw_text("PREMISE:", SCREEN_WIDTH // 2, 550,
+                        arcade.color.WHITE, font_size=40,
+                        width=1000, align="center",
+                        anchor_x="center", anchor_y="center")
+        arcade.draw_text("You play Bill, a confused Mudd student who wakes up in a dungeon.", SCREEN_WIDTH // 2, 500,
+                        arcade.color.WHITE, font_size=20,
+                        width=1000, align="center",
+                        anchor_x="center", anchor_y="center")
+        arcade.draw_text("Can you solve all the puzzles and escape?", SCREEN_WIDTH // 2, 450,
+                        arcade.color.WHITE, font_size=20,
+                        width=1000, align="center",
+                        anchor_x="center", anchor_y="center")
+
+        arcade.draw_text("INSTRUCTIONS", SCREEN_WIDTH // 2, 400,
                          arcade.color.WHITE, font_size=40,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Use the arrow keys to move", SCREEN_WIDTH // 2, 500,
+        arcade.draw_text("Use the arrow keys to move", SCREEN_WIDTH // 2, 350,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Press \"Z\" to interact with objects while facing them", SCREEN_WIDTH // 2, 450,
+        arcade.draw_text("Press \"Z\" to interact with objects while facing them", SCREEN_WIDTH // 2, 300,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
-        arcade.draw_text("Press \"C\" to show the inventory", SCREEN_WIDTH // 2, 400,
+        arcade.draw_text("Press \"C\" to show the inventory", SCREEN_WIDTH // 2, 250,
                          arcade.color.WHITE, font_size=20,
                          width=1000, align="center",
                          anchor_x="center", anchor_y="center")
+
 
         for button in self.button_list_howTo:
             button.draw()
