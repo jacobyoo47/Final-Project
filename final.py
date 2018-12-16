@@ -1047,6 +1047,9 @@ class MyGame(arcade.Window):
                     self.rooms[self.current_room].object_list.append(self.rooms[self.current_room].secret_item[0])
                     del self.rooms[self.current_room].password[0]
                     del self.rooms[self.current_room].secret_item[0]
+                    if self.rooms[self.current_room].password == []:
+                        self.current_message = objects.InteractObjects('Images/key.png' , SPRITE_SCALING, 'Sounds like something dropped into the maze...')
+                        self.state = DIALOGUE
             else:
                 if password == self.rooms[self.current_room].password:
 

@@ -1,0 +1,12 @@
+Bill's Adventures v. 1.0 
+
+Made by Nick Tan, Jacob Yoo, and Jason Chen using the arcade library by Paul Vincent Craven.
+
+
+WALKTHROUGH (How to obtain all keys):
+1. Search the bed
+2. Grab the crowbar and smash the crate
+3. The answer to the lever puzzle is "Neutral", "Left", "Left", "Right"
+4. Grab the stick in the maze and fix the lever
+5. The answer to the other lever puzzle is "Right", "Left", "Right", "Left", "Neutral"
+6. Leave the maze to win!
